@@ -1,3 +1,3 @@
-D:/files/solution_for_clion/LexminiC/cmake-build-debug/CMakeFiles/LexminiC.dir
-D:/files/solution_for_clion/LexminiC/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/files/solution_for_clion/LexminiC/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/CMakeFiles/LexminiC.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/CMakeFiles/rebuild_cache.dir

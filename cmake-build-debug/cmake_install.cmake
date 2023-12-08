@@ -1,4 +1,4 @@
-# Install script for directory: D:/files/solution_for_clion/LexminiC
+# Install script for directory: D:/files/solution_for_clion/Lexer_miniC
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/files/solution_for_clion/LexminiC/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

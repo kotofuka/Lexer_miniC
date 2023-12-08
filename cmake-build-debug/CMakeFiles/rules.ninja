@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SD:\files\solution_for_clion\LexminiC -BD:\files\solution_for_clion\LexminiC\cmake-build-debug
+  command = "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SD:\files\solution_for_clion\Lexer_miniC -BD:\files\solution_for_clion\Lexer_miniC\cmake-build-debug
   description = Re-running CMake...
   generator = 1
 

@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "D:/files/solution_for_clion/LexminiC/cmake-build-debug",
-		"source" : "D:/files/solution_for_clion/LexminiC"
+		"build" : "D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug",
+		"source" : "D:/files/solution_for_clion/Lexer_miniC"
 	},
 	"version" : 
 	{
