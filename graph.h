@@ -1,21 +1,23 @@
 //
-// Created by Admin on 06.12.2023.
+// Created by Admin on 08.12.2023.
 //
 
 #ifndef LEXMINIC_GRAPH_H
 #define LEXMINIC_GRAPH_H
 
-#include <string>
 #include <unordered_map>
+#include <vector>
+#include <string>
 
-using namespace std;
+struct E{
+    std::string filter;
+    int newState;
+    bool append;
+    bool read;
+    std::string lexem;
+    bool clear = false;
+};
 
-const string SPACE = " ";
-const string EMPTY = "";
+std::unordered_map<int, std::vector<E>> getGraph();
 
-
-
-struct E;
-
-unordered_map<int, unordered_map<string, E>> getGraph();
 #endif //LEXMINIC_GRAPH_H

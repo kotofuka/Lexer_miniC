@@ -127,12 +127,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "check.cpp",
+			"path" : "Lexer.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
-			"path" : "check.h",
+			"path" : "Lexer.h",
 			"sourceGroupIndex" : 1
 		}
 	],
