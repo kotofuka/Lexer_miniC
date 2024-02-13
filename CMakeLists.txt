@@ -3,9 +3,12 @@ project(LexminiC)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(LexminiC
-        main.cpp
-        graph.cpp
-        graph.h
-        Lexer.cpp
-        Lexer.h)
+set(SOURCE_FILES main.cpp)
+add_executable(Lexer_run ${SOURCE_FILES})
+
+include_directories(Lexer_lib)
+add_subdirectory(Lexer_lib)
+
+target_link_libraries(Lexer_run Lexer_lib)
+
+add_subdirectory(Google_tests)
