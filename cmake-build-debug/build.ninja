@@ -47,12 +47,12 @@ cmake_ninja_workdir = D$:/files/solution_for_clion/Lexer_miniC/cmake-build-debug
 #############################################
 # Order-only phony target for Lexer_run
 
-build cmake_object_order_depends_target_Lexer_run: phony || cmake_object_order_depends_target_Lexer_lib
+build cmake_object_order_depends_target_Lexer_run: phony || cmake_object_order_depends_target_Lexer_lib cmake_object_order_depends_target_shunting_yard_lib
 
 build CMakeFiles/Lexer_run.dir/main.cpp.obj: CXX_COMPILER__Lexer_run_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/main.cpp || cmake_object_order_depends_target_Lexer_run
   DEP_FILE = CMakeFiles\Lexer_run.dir\main.cpp.obj.d
   FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
-  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib
   OBJECT_DIR = CMakeFiles\Lexer_run.dir
   OBJECT_FILE_DIR = CMakeFiles\Lexer_run.dir
 
@@ -64,9 +64,9 @@ build CMakeFiles/Lexer_run.dir/main.cpp.obj: CXX_COMPILER__Lexer_run_unscanned_D
 #############################################
 # Link the executable Lexer_run.exe
 
-build Lexer_run.exe: CXX_EXECUTABLE_LINKER__Lexer_run_Debug CMakeFiles/Lexer_run.dir/main.cpp.obj | Lexer_lib/libLexer_lib.a || Lexer_lib/libLexer_lib.a
+build Lexer_run.exe: CXX_EXECUTABLE_LINKER__Lexer_run_Debug CMakeFiles/Lexer_run.dir/main.cpp.obj | Lexer_lib/libLexer_lib.a shunting_yard_lib/libshunting_yard_lib.a || Lexer_lib/libLexer_lib.a shunting_yard_lib/libshunting_yard_lib.a
   FLAGS = -g
-  LINK_LIBRARIES = Lexer_lib/libLexer_lib.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_LIBRARIES = Lexer_lib/libLexer_lib.a  shunting_yard_lib/libshunting_yard_lib.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Lexer_run.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -254,6 +254,108 @@ build Lexer_lib/install/strip: phony Lexer_lib/CMakeFiles/install/strip.util
 # =============================================================================
 
 # =============================================================================
+# Object build statements for STATIC_LIBRARY target shunting_yard_lib
+
+
+#############################################
+# Order-only phony target for shunting_yard_lib
+
+build cmake_object_order_depends_target_shunting_yard_lib: phony || shunting_yard_lib/CMakeFiles/shunting_yard_lib.dir
+
+build shunting_yard_lib/CMakeFiles/shunting_yard_lib.dir/shunting_yard.cpp.obj: CXX_COMPILER__shunting_yard_lib_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib/shunting_yard.cpp || cmake_object_order_depends_target_shunting_yard_lib
+  DEP_FILE = shunting_yard_lib\CMakeFiles\shunting_yard_lib.dir\shunting_yard.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib
+  OBJECT_DIR = shunting_yard_lib\CMakeFiles\shunting_yard_lib.dir
+  OBJECT_FILE_DIR = shunting_yard_lib\CMakeFiles\shunting_yard_lib.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target shunting_yard_lib
+
+
+#############################################
+# Link the static library shunting_yard_lib\libshunting_yard_lib.a
+
+build shunting_yard_lib/libshunting_yard_lib.a: CXX_STATIC_LIBRARY_LINKER__shunting_yard_lib_Debug shunting_yard_lib/CMakeFiles/shunting_yard_lib.dir/shunting_yard.cpp.obj
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = shunting_yard_lib\CMakeFiles\shunting_yard_lib.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = shunting_yard_lib\libshunting_yard_lib.a
+  TARGET_PDB = shunting_yard_lib.a.dbg
+
+
+#############################################
+# Utility command for edit_cache
+
+build shunting_yard_lib/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D D:\files\solution_for_clion\Lexer_miniC\cmake-build-debug\shunting_yard_lib && "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build shunting_yard_lib/edit_cache: phony shunting_yard_lib/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build shunting_yard_lib/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D D:\files\solution_for_clion\Lexer_miniC\cmake-build-debug\shunting_yard_lib && "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SD:\files\solution_for_clion\Lexer_miniC -BD:\files\solution_for_clion\Lexer_miniC\cmake-build-debug"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build shunting_yard_lib/rebuild_cache: phony shunting_yard_lib/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build shunting_yard_lib/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build shunting_yard_lib/CMakeFiles/install.util: CUSTOM_COMMAND shunting_yard_lib/all
+  COMMAND = cmd.exe /C "cd /D D:\files\solution_for_clion\Lexer_miniC\cmake-build-debug\shunting_yard_lib && "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" -P cmake_install.cmake"
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build shunting_yard_lib/install: phony shunting_yard_lib/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build shunting_yard_lib/CMakeFiles/install/local.util: CUSTOM_COMMAND shunting_yard_lib/all
+  COMMAND = cmd.exe /C "cd /D D:\files\solution_for_clion\Lexer_miniC\cmake-build-debug\shunting_yard_lib && "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build shunting_yard_lib/install/local: phony shunting_yard_lib/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build shunting_yard_lib/CMakeFiles/install/strip.util: CUSTOM_COMMAND shunting_yard_lib/all
+  COMMAND = cmd.exe /C "cd /D D:\files\solution_for_clion\Lexer_miniC\cmake-build-debug\shunting_yard_lib && "D:\files\CLion\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake"
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build shunting_yard_lib/install/strip: phony shunting_yard_lib/CMakeFiles/install/strip.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# D:/files/solution_for_clion/Lexer_miniC/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
 # Object build statements for EXECUTABLE target Google_test_run
 
 
@@ -265,7 +367,7 @@ build cmake_object_order_depends_target_Google_test_run: phony || cmake_object_o
 build Google_tests/CMakeFiles/Google_test_run.dir/tests.cpp.obj: CXX_COMPILER__Google_test_run_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/tests.cpp || cmake_object_order_depends_target_Google_test_run
   DEP_FILE = Google_tests\CMakeFiles\Google_test_run.dir\tests.cpp.obj.d
   FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
-  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
   OBJECT_DIR = Google_tests\CMakeFiles\Google_test_run.dir
   OBJECT_FILE_DIR = Google_tests\CMakeFiles\Google_test_run.dir
 
@@ -439,7 +541,7 @@ build cmake_object_order_depends_target_gmock: phony || cmake_object_order_depen
 build Google_tests/lib/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj: CXX_COMPILER__gmock_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/src/gmock-all.cc || cmake_object_order_depends_target_gmock
   DEP_FILE = Google_tests\lib\googlemock\CMakeFiles\gmock.dir\src\gmock-all.cc.obj.d
   FLAGS = -g -std=c++20 -fdiagnostics-color=always -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
-  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/include -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/include -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
   OBJECT_DIR = Google_tests\lib\googlemock\CMakeFiles\gmock.dir
   OBJECT_FILE_DIR = Google_tests\lib\googlemock\CMakeFiles\gmock.dir\src
 
@@ -471,7 +573,7 @@ build cmake_object_order_depends_target_gmock_main: phony || cmake_object_order_
 build Google_tests/lib/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj: CXX_COMPILER__gmock_main_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/src/gmock_main.cc || cmake_object_order_depends_target_gmock_main
   DEP_FILE = Google_tests\lib\googlemock\CMakeFiles\gmock_main.dir\src\gmock_main.cc.obj.d
   FLAGS = -g -std=c++20 -fdiagnostics-color=always -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
-  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
   OBJECT_DIR = Google_tests\lib\googlemock\CMakeFiles\gmock_main.dir
   OBJECT_FILE_DIR = Google_tests\lib\googlemock\CMakeFiles\gmock_main.dir\src
 
@@ -573,7 +675,7 @@ build cmake_object_order_depends_target_gtest: phony || Google_tests/lib/googlet
 build Google_tests/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj: CXX_COMPILER__gtest_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/src/gtest-all.cc || cmake_object_order_depends_target_gtest
   DEP_FILE = Google_tests\lib\googletest\CMakeFiles\gtest.dir\src\gtest-all.cc.obj.d
   FLAGS = -g -std=c++20 -fdiagnostics-color=always -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
-  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -ID:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
   OBJECT_DIR = Google_tests\lib\googletest\CMakeFiles\gtest.dir
   OBJECT_FILE_DIR = Google_tests\lib\googletest\CMakeFiles\gtest.dir\src
 
@@ -605,7 +707,7 @@ build cmake_object_order_depends_target_gtest_main: phony || cmake_object_order_
 build Google_tests/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj: CXX_COMPILER__gtest_main_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/src/gtest_main.cc || cmake_object_order_depends_target_gtest_main
   DEP_FILE = Google_tests\lib\googletest\CMakeFiles\gtest_main.dir\src\gtest_main.cc.obj.d
   FLAGS = -g -std=c++20 -fdiagnostics-color=always -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
-  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
+  INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
   OBJECT_DIR = Google_tests\lib\googletest\CMakeFiles\gtest_main.dir
   OBJECT_FILE_DIR = Google_tests\lib\googletest\CMakeFiles\gtest_main.dir\src
 
@@ -719,6 +821,10 @@ build libgtest.a: phony lib/libgtest.a
 
 build libgtest_main.a: phony lib/libgtest_main.a
 
+build libshunting_yard_lib.a: phony shunting_yard_lib/libshunting_yard_lib.a
+
+build shunting_yard_lib: phony shunting_yard_lib/libshunting_yard_lib.a
+
 # =============================================================================
 # Folder targets.
 
@@ -727,7 +833,7 @@ build libgtest_main.a: phony lib/libgtest_main.a
 #############################################
 # Folder: D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug
 
-build all: phony Lexer_run.exe Lexer_lib/all Google_tests/all
+build all: phony Lexer_run.exe Lexer_lib/all shunting_yard_lib/all Google_tests/all
 
 # =============================================================================
 
@@ -765,20 +871,27 @@ build Google_tests/lib/googletest/all: phony lib/libgtest.a lib/libgtest_main.a
 build Lexer_lib/all: phony Lexer_lib/libLexer_lib.a
 
 # =============================================================================
+
+#############################################
+# Folder: D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib
+
+build shunting_yard_lib/all: phony shunting_yard_lib/libshunting_yard_lib.a
+
+# =============================================================================
 # Built-in targets
 
 
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | CMakeCache.txt CMakeFiles/3.27.8/CMakeCCompiler.cmake CMakeFiles/3.27.8/CMakeCXXCompiler.cmake CMakeFiles/3.27.8/CMakeRCCompiler.cmake CMakeFiles/3.27.8/CMakeSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCXXInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeDependentOption.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeGenericSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakePackageConfigHelpers.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeRCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/GNUInstallDirs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-windres.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/WriteBasicConfigVersionFile.cmake D$:/files/solution_for_clion/Lexer_miniC/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/Config.cmake.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/internal_utils.cmake D$:/files/solution_for_clion/Lexer_miniC/Lexer_lib/CMakeLists.txt
+build build.ninja: RERUN_CMAKE | CMakeCache.txt CMakeFiles/3.27.8/CMakeCCompiler.cmake CMakeFiles/3.27.8/CMakeCXXCompiler.cmake CMakeFiles/3.27.8/CMakeRCCompiler.cmake CMakeFiles/3.27.8/CMakeSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCXXInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeDependentOption.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeGenericSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakePackageConfigHelpers.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeRCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/GNUInstallDirs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-windres.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/WriteBasicConfigVersionFile.cmake D$:/files/solution_for_clion/Lexer_miniC/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/Config.cmake.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/internal_utils.cmake D$:/files/solution_for_clion/Lexer_miniC/Lexer_lib/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib/CMakeLists.txt
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build CMakeCache.txt CMakeFiles/3.27.8/CMakeCCompiler.cmake CMakeFiles/3.27.8/CMakeCXXCompiler.cmake CMakeFiles/3.27.8/CMakeRCCompiler.cmake CMakeFiles/3.27.8/CMakeSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCXXInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeDependentOption.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeGenericSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakePackageConfigHelpers.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeRCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/GNUInstallDirs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-windres.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/WriteBasicConfigVersionFile.cmake D$:/files/solution_for_clion/Lexer_miniC/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/Config.cmake.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/internal_utils.cmake D$:/files/solution_for_clion/Lexer_miniC/Lexer_lib/CMakeLists.txt: phony
+build CMakeCache.txt CMakeFiles/3.27.8/CMakeCCompiler.cmake CMakeFiles/3.27.8/CMakeCXXCompiler.cmake CMakeFiles/3.27.8/CMakeRCCompiler.cmake CMakeFiles/3.27.8/CMakeSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCXXInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeDependentOption.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeGenericSystem.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakePackageConfigHelpers.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeRCInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Compiler/GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/GNUInstallDirs.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-C.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX-ABI.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-GNU.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows-windres.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/Windows.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake D$:/files/CLion/CLion$ 2023.2.2/bin/cmake/win/x64/share/cmake-3.27/Modules/WriteBasicConfigVersionFile.cmake D$:/files/solution_for_clion/Lexer_miniC/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googlemock/cmake/gmock_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/Config.cmake.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/gtest_main.pc.in D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/cmake/internal_utils.cmake D$:/files/solution_for_clion/Lexer_miniC/Lexer_lib/CMakeLists.txt D$:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib/CMakeLists.txt: phony
 
 
 #############################################

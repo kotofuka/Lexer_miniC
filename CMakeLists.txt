@@ -11,4 +11,9 @@ add_subdirectory(Lexer_lib)
 
 target_link_libraries(Lexer_run Lexer_lib)
 
+include_directories(shunting_yard_lib)
+add_subdirectory(shunting_yard_lib)
+
+target_link_libraries(Lexer_run shunting_yard_lib)
+
 add_subdirectory(Google_tests)
