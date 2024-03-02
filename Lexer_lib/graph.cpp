@@ -83,7 +83,7 @@ unordered_map<int, vector<E>> graph = {
 
         {6, {
                 {"=", 7, false, false, ""},
-                {"", 0, false, true, "opassign"}
+                {"", 0, false, false, "opassign"}
         }},
 
         {7, {
@@ -92,7 +92,7 @@ unordered_map<int, vector<E>> graph = {
 
         {8, {
                 {"+", 9, false, false, ""},
-                {"", 0, false, true, "opplus"}
+                {"", 0, false, false, "opplus"}
         }},
 
         {9, {
@@ -137,7 +137,6 @@ unordered_map<int, vector<E>> graph = {
 
         {18, {
                 {"\"", 20, false, false, ""},
-                {"\n", 19, false, false, ""},
                 {"", 18, true, true, ""},
                 {"EOF", 19, false, false, ""}
         }},

@@ -12,6 +12,13 @@ D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Lexer_lib/CMakeFiles/l
 D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Lexer_lib/CMakeFiles/install.dir
 D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Lexer_lib/CMakeFiles/install/local.dir
 D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Lexer_lib/CMakeFiles/install/strip.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/shunting_yard_lib.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/edit_cache.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/rebuild_cache.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/list_install_components.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/install.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/install/local.dir
+D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/shunting_yard_lib/CMakeFiles/install/strip.dir
 D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Google_tests/CMakeFiles/Google_test_run.dir
 D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Google_tests/CMakeFiles/edit_cache.dir
 D:/files/solution_for_clion/Lexer_miniC/cmake-build-debug/Google_tests/CMakeFiles/rebuild_cache.dir

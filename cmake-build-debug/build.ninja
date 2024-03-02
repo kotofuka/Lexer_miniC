@@ -364,8 +364,8 @@ build shunting_yard_lib/install/strip: phony shunting_yard_lib/CMakeFiles/instal
 
 build cmake_object_order_depends_target_Google_test_run: phony || cmake_object_order_depends_target_Lexer_lib cmake_object_order_depends_target_gtest cmake_object_order_depends_target_gtest_main
 
-build Google_tests/CMakeFiles/Google_test_run.dir/tests.cpp.obj: CXX_COMPILER__Google_test_run_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/tests.cpp || cmake_object_order_depends_target_Google_test_run
-  DEP_FILE = Google_tests\CMakeFiles\Google_test_run.dir\tests.cpp.obj.d
+build Google_tests/CMakeFiles/Google_test_run.dir/lex-tests.cpp.obj: CXX_COMPILER__Google_test_run_unscanned_Debug D$:/files/solution_for_clion/Lexer_miniC/Google_tests/lex-tests.cpp || cmake_object_order_depends_target_Google_test_run
+  DEP_FILE = Google_tests\CMakeFiles\Google_test_run.dir\lex-tests.cpp.obj.d
   FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
   INCLUDES = -ID:/files/solution_for_clion/Lexer_miniC/Lexer_lib -ID:/files/solution_for_clion/Lexer_miniC/shunting_yard_lib -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest/include -isystem D:/files/solution_for_clion/Lexer_miniC/Google_tests/lib/googletest
   OBJECT_DIR = Google_tests\CMakeFiles\Google_test_run.dir
@@ -379,7 +379,7 @@ build Google_tests/CMakeFiles/Google_test_run.dir/tests.cpp.obj: CXX_COMPILER__G
 #############################################
 # Link the executable Google_tests\Google_test_run.exe
 
-build Google_tests/Google_test_run.exe: CXX_EXECUTABLE_LINKER__Google_test_run_Debug Google_tests/CMakeFiles/Google_test_run.dir/tests.cpp.obj | Lexer_lib/libLexer_lib.a lib/libgtest.a lib/libgtest_main.a lib/libgtest.a || Lexer_lib/libLexer_lib.a lib/libgtest.a lib/libgtest_main.a
+build Google_tests/Google_test_run.exe: CXX_EXECUTABLE_LINKER__Google_test_run_Debug Google_tests/CMakeFiles/Google_test_run.dir/lex-tests.cpp.obj | Lexer_lib/libLexer_lib.a lib/libgtest.a lib/libgtest_main.a lib/libgtest.a || Lexer_lib/libLexer_lib.a lib/libgtest.a lib/libgtest_main.a
   FLAGS = -g
   LINK_LIBRARIES = Lexer_lib/libLexer_lib.a  lib/libgtest.a  lib/libgtest_main.a  lib/libgtest.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = Google_tests\CMakeFiles\Google_test_run.dir

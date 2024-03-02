@@ -8,6 +8,11 @@
 
 using namespace std;
 
+bool is_letter(const string& word){
+    if (isalpha(word[0]) or word[0] == '_') return true;
+    return false;
+}
+
 unordered_set <string> keywords = {
         "int",
         "char",
@@ -39,7 +44,7 @@ std::pair<std::string, std::string> Lexer::getNextLexem() {
         //cout << "\'" << cache << "\' " << state << endl;
         for (auto& now:graph[state]) {
             if (now.filter == "letter") {
-                if (isalpha(cache)) {
+                if (isalpha(cache) or cache == '_') {
                     result = now;
                     break;
                 }
@@ -57,6 +62,7 @@ std::pair<std::string, std::string> Lexer::getNextLexem() {
                 }
             } else if (now.filter[0] == cache) {
                 result = now;
+
                 break;
             } else if (now.filter.empty() and result.filter.empty()){
                 result = now;
@@ -91,3 +97,5 @@ std::pair<std::string, std::string> Lexer::getNextLexem() {
     }
     return lexem;
 }
+
+

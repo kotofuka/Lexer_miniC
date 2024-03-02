@@ -30,7 +30,12 @@ vector<pair<string, string>> Shunting_yard::next_token(const pair<std::string, s
 vector<pair<string, string>> Shunting_yard::clear_stack() {
     vector<pair<string, string>> list;
     while (!stack.empty()){
+        if (stack.top().first == "lpar") {
+            list.push_back({"error", ""});
+            break;
+        }
         list.push_back(stack.top());
+
         stack.pop();
     }
     return list;

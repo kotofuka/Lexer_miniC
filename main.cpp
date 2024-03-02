@@ -12,7 +12,7 @@ int main(){
     Lexer lexer(file);
     pair<string, string> lexem;
 
-    /*
+
     while (true){
         lexem = lexer.getNextLexem();
         cout << "[" << lexem.first << ", \"" << lexem.second << "\"]\n";
@@ -20,7 +20,8 @@ int main(){
             break;
         }
     }
-    */
+
+    /*
     Shunting_yard SY = Shunting_yard();
     while (true){
         lexem = lexer.getNextLexem();
@@ -36,11 +37,12 @@ int main(){
             }
             cout << "[" << token.first << ", \"" << token.second << "\"]\n";
         }
-        if (lexem.first == "EOF"){
+        if (lexem.first == "EOF" or lexem.first == "error"){
             cout << "[" << lexem.first << ", \"" << lexem.second << "\"]\n";
             break;
         }
     }
+     */
 
     return 0;
 }
