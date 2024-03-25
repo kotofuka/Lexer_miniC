@@ -1,48 +1,36 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include "Lexer_lib/Lexer.h"
-#include "shunting_yard.h"
-
+#include "iostream"
+#include "sstream"
+#include "string"
+#include "lexem.h"
+#include "ExprSA_test.h"
 
 using namespace std;
 
+
+
 int main(){
-    fstream file(R"(D:\\files\\solution_for_clion\\Lexer_miniC\\Lexer_lib\\input_3.txt)");
-    Lexer lexer(file);
-    pair<string, string> lexem;
+//    fstream file(R"(D:\\files\\solution_for_clion\\Lexer_miniC\\lex-lib\\input_3.txt)");
+//    Lexer lexer(file);
+//    pair<string, string> lexem;
+//
+//
+//    while (true){
+//        lexem = lexer.getNextLexem();
+//        cout << "[" << lexem.first << ", \"" << lexem.second << "\"]\n";
+//        if (lexem.first == "EOF" or lexem.first == "error"){
+//            break;
+//        }
+//    }
+    string expression = "a+1";
 
+    stringstream stream { expression };
+    Expr_SA exprSa (stream);
 
-    while (true){
-        lexem = lexer.getNextLexem();
-        cout << "[" << lexem.first << ", \"" << lexem.second << "\"]\n";
-        if (lexem.first == "EOF" or lexem.first == "error"){
-            break;
-        }
+    vector<Lexem> tokenList = exprSa.getLRTokens();
+
+    for (const auto& token: tokenList){
+        cout << "{\"" << token.first << "\", \"" << token.second << "\"}" << endl;
     }
-
-    /*
-    Shunting_yard SY = Shunting_yard();
-    while (true){
-        lexem = lexer.getNextLexem();
-        if (lexem.first == "error") {
-            cout << "[error, \"\"" << endl;
-            break;
-        }
-        vector<pair<string , string>> list = lexem.first == "EOF"? SY.clear_stack(): SY.next_token(lexem);
-        for (auto token: list) {
-            if (token.first == "error") {
-                lexem = token;
-                break;
-            }
-            cout << "[" << token.first << ", \"" << token.second << "\"]\n";
-        }
-        if (lexem.first == "EOF" or lexem.first == "error"){
-            cout << "[" << lexem.first << ", \"" << lexem.second << "\"]\n";
-            break;
-        }
-    }
-     */
 
     return 0;
 }
