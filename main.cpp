@@ -3,6 +3,7 @@
 #include "string"
 #include "lexem.h"
 #include "ExprSA_test.h"
+#include "TopDownSA.h"
 
 using namespace std;
 
@@ -21,16 +22,9 @@ int main(){
 //            break;
 //        }
 //    }
-    string expression = "a+1";
-
-    stringstream stream { expression };
-    Expr_SA exprSa (stream);
-
-    vector<Lexem> tokenList = exprSa.getLRTokens();
-
-    for (const auto& token: tokenList){
-        cout << "{\"" << token.first << "\", \"" << token.second << "\"}" << endl;
-    }
-
+    fstream file(R"(D:\\files\\solution_for_clion\\Lexer_miniC\\lex-lib\\input_3.txt)");
+    Lexer lexer = Lexer(file);
+    LL ll = LL(lexer,  R"(D:\\files\\solution_for_clion\\Lexer_miniC\\output.txt)");
+    ll.solve();
     return 0;
 }

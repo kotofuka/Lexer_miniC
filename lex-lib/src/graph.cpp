@@ -58,7 +58,7 @@ unordered_map<int, vector<E>> graph = {
             {"]", 0, false, true, "rbracket"},
             {";", 0, false, true, "semicolon"},
             {",", 0, false, true, "comma"},
-            {".", 0, false, true, "colon"},
+            {":", 0, false, true, "colon"},
             {">", 0, false, true, "opgt"},
             {"*", 0, false, true, "opmul"}
         }},

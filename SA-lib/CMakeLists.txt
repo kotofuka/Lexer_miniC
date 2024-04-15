@@ -8,6 +8,6 @@ include_directories(include)
 
 
 
-add_library(SA-lib scr/ExprSA_test.cpp)
+add_library(SA-lib scr/ExprSA_test.cpp scr/TopDownSA.cpp)
 target_link_libraries(SA-lib lex-lib)
 target_include_directories(SA-lib PUBLIC include)

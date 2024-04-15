@@ -81,12 +81,12 @@ void Expr_SA::processTokens() {
             result_list.erase(iter, result_list.end());
 
             result_list.insert(iter, dict[key]);
-            std::cout<< "==============================" << std::endl;
+            std::cout << "==============================" << std::endl;
             for (const auto& token: result_list){
                 std::cout << "{\"" << token.first << "\", \"" << token.second << "\"}" << std::endl;
             }
             std::cout<< "==============================" << std::endl;
-            return;
+            iter--;
         }
 
         iter++;

@@ -1,1 +1,5 @@
-int a=0;int aa=182;out aa+a==-123;
+int main(){
+    int a, b;
+    a = a + b;
+    return f(a) + f(b);
+}
