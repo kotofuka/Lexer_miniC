@@ -102,6 +102,8 @@ private:
     bool IOp();
 
     bool OOp();
+
+    bool OOpList();
     //
     // ArgList
     bool Arglist();
@@ -113,6 +115,7 @@ private:
     void nextState(const int& state);
     void backStateIt();
     void addString(const string& str);
+    void backLexem(const Lexem& token);
 
     Lexer lexer;
     Lexem tempLexem;

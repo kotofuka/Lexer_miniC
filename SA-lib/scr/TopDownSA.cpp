@@ -13,12 +13,17 @@ void LL::solve() {
     statesIt = states.begin();
     nextState(0);
     addString("StmtList");
+
     bool f = StmtList() and *iter == LEX_EOF;
     outStr.open(outPath);
-    for (const auto& now: output){
-        outStr << now << endl;
-        cout<< now << endl;
+    if (f) {
+        for (const auto &now: output) {
+            outStr << now << endl;
+            cout << now << endl;
+        }
+        outStr << endl << "Result: Accept" << endl;
     }
+    else outStr << endl << "Result: Error" << endl;
 
     outStr.close();
     return;
@@ -39,14 +44,16 @@ void LL::setLexem() {
     return;
 }
 
+
+
 void LL::nextState(const int &state) {
-    states.emplace_back(state);
+    states.push_back(state);
     statesIt = states.end() - 1;
 }
 
 void LL::backStateIt() {
     states.pop_back();
-    statesIt = states.end() - 1;
+    statesIt = states.begin();
 }
 
 void LL::addString(const std::string &str) {
@@ -62,13 +69,11 @@ void LL::addString(const std::string &str) {
         else outputString += "  ";
     }
     output.push_back(outputString + str);
-    cout << outputString + str << endl;
+    //cout << outputString + str << endl;
 }
 //
 //Expression Grammer
 bool LL::E() {
-    auto tempIt = statesIt;
-
     nextState(0);
     addString("E7");
 
@@ -78,13 +83,11 @@ bool LL::E() {
 }
 
 bool LL::E7(){
-    auto  tempIt = statesIt;
 
     nextState(1);
     addString("E6");
 
     if (!E6()) {return false; }
-    tempIt = statesIt;
 
     nextState(0);
     addString("E7\'");
@@ -99,10 +102,8 @@ bool LL::E7list(){
 
         nextState(1);
         addString("opor E6");
-        auto tempIt = statesIt;
 
         if (!E6()) {return false; }
-        tempIt = statesIt;
         nextState(0);
         addString("E7\'");
         if (!E7list()) {return false; }
@@ -112,14 +113,11 @@ bool LL::E7list(){
 }
 
 bool LL::E6(){
-    auto tempIt = statesIt;
-
     nextState(1);
     addString("E5");
 
     if (!E5()) {return false; }
 
-    tempIt = statesIt;
     nextState(0);
     addString("E6\'");
 
@@ -134,11 +132,9 @@ bool LL::E6list(){
 
         nextState(1);
         addString("opand E5");
-        auto tempIt = statesIt;
 
         if (!E5()) {return false; }
 
-        tempIt = statesIt;
         nextState(0);
         addString("E6\'");
 
@@ -149,14 +145,12 @@ bool LL::E6list(){
 }
 
 bool LL::E5(){
-    auto tempIt = statesIt;
 
     nextState(1);
     addString("E4");
 
     if (!E4()) {return false; }
 
-    tempIt = statesIt;
     nextState(0);
     addString("E5\'");
 
@@ -168,12 +162,11 @@ bool LL::E5(){
 bool LL::E5list(){
     if (iter->first == "opeq" or iter->first == "opne" or iter->first == "oplt" or iter->first == "opgt" or
             iter->first == "ople"){
-        string opToken = iter->first;
+        auto opToken = iter;
         setLexem();
 
         nextState(0);
-        addString(opToken + " E4");
-        auto tempIt = statesIt;
+        addString(opToken->first + " E4");
 
         if (!E4()) {return false; }
     }
@@ -182,14 +175,12 @@ bool LL::E5list(){
 }
 
 bool LL::E4(){
-    auto tempIt = statesIt;
 
     nextState(1);
     addString("E3");
 
     if (!E3()) {return false; }
 
-    tempIt = statesIt;
     nextState(0);
     addString("E4\'");
 
@@ -200,16 +191,14 @@ bool LL::E4(){
 
 bool LL::E4list(){
     if (iter->first == "opplus" or iter->first == "opminus"){
-        string opToken = iter->first;
+        auto opToken = iter;
         setLexem();
 
         nextState(1);
-        addString(opToken + " E3");
-        auto tempIt = statesIt;
+        addString(opToken->first + " E3");
 
         if (!E3()) {return false; }
 
-        tempIt = statesIt;
         nextState(0);
         addString("E4\'");
 
@@ -220,14 +209,12 @@ bool LL::E4list(){
 }
 
 bool LL::E3(){
-    auto tempIt = statesIt;
 
     nextState(1);
     addString("E2");
 
     if (!E2()) {return false; }
 
-    tempIt = statesIt;
     nextState(0);
     addString("E3\'");
 
@@ -242,7 +229,6 @@ bool LL::E3list(){
 
         nextState(1);
         addString("opmul E2");
-        auto tempIt = statesIt;
 
         if (!E2()) {return false; }
 
@@ -256,7 +242,6 @@ bool LL::E3list(){
 }
 
 bool LL::E2(){
-    auto tempIt = statesIt;
     if (iter->first == "opnot"){
         setLexem();
         nextState(0);
@@ -264,6 +249,8 @@ bool LL::E2(){
 
         if (!E1()){return false;}
         backStateIt();
+        backStateIt();
+        return true;
     }
     else{
         nextState(0);
@@ -277,8 +264,6 @@ bool LL::E2(){
 }
 
 bool LL::E1(){
-    auto tempIt = statesIt;
-
     if (iter->first == "opinc"){
         setLexem();
 
@@ -325,11 +310,11 @@ bool LL::E1(){
         backStateIt();
         return true;
     }
+
     return false;
 }
 
 bool LL::E1List() {
-    auto tempIt = statesIt;
     if (iter->first == "lpar"){
         setLexem();
 
@@ -338,10 +323,8 @@ bool LL::E1List() {
 
         if (!Arglist()) {return false; }
 
-        tempIt = statesIt;
-        nextState(0);
-
         if (iter->first != "rpar") {return false; }
+        nextState(0);
         addString("rpar");
         setLexem();
         backStateIt();
@@ -361,22 +344,20 @@ bool LL::E1List() {
 
 //Entry point
 bool LL::StmtList() {
-    auto tempIt = statesIt;
     if (*iter == LEX_EOF) return true;
 
-    vector<Lexem>::iterator it = iter;
-    int tempHeight = treeHeight;
     nextState(1);
     addString("Stmt");
+    auto listIt = iter;
     if (Stmt()) {
-        tempHeight = treeHeight;
         nextState(0);
         addString("StmtList");
-        if (!StmtList()) return false;
+        if (!StmtList()) {
+            return false; }
     } else {
-        iter = it;
         backStateIt();
         output.pop_back();
+        iter = listIt;
     }
     backStateIt();
     return true;
@@ -385,84 +366,71 @@ bool LL::StmtList() {
 bool LL::Stmt() {
     if (*iter == LEX_EOF) return false;
 
-    vector<Lexem>::iterator tempIt = iter;
-    int tempHeight = treeHeight;
+    auto listIt = iter;
+    auto tempHeight = treeHeight;
 
     if (DeclareStmt()) return true;
     else {
-        iter = tempIt;
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         backStateIt();
         treeHeight = tempHeight;
+        iter = listIt;
     }
-    tempHeight = treeHeight;
 
     if (AssignOrCallOp()) return true;
     else {
-        iter = tempIt;
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         backStateIt();
         treeHeight = tempHeight;
+        iter = listIt;
     }
-
-    tempHeight = treeHeight;
 
     if (WhileOp()) return true;
     else {
-        iter = tempIt;
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        backStateIt();
         backStateIt();
         treeHeight = tempHeight;
-        backStateIt();
+        iter = listIt;
     }
-
-    tempHeight = treeHeight;
 
     if (ForOp()) return true;
     else {
-        iter = tempIt;
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         backStateIt();
         treeHeight = tempHeight;
+        iter = listIt;
     }
-
-    tempHeight = treeHeight;
 
     if (IfOp()) return true;
     else {
-        iter = tempIt;
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         backStateIt();
         treeHeight = tempHeight;
+        iter = listIt;
     }
-
-    tempHeight = treeHeight;
 
     if (SwitchOp()) return true;
     else {
-        iter = tempIt;
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         backStateIt();
         treeHeight = tempHeight;
+        iter = listIt;
     }
-
-    tempHeight = treeHeight;
 
     if (IOp()) return true;
     else {
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         treeHeight = tempHeight;
-        iter = tempIt;
+        iter = listIt;
     }
 
     if (OOp()) return true;
     else {
-        output.erase(output.end() - treeHeight + tempHeight, output.end());
-        iter = tempIt;
+        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
         treeHeight = tempHeight;
+        iter = listIt;
     }
-
-    tempHeight = treeHeight;
 
     if (iter->first == "semicolon"){
         setLexem();
@@ -473,14 +441,14 @@ bool LL::Stmt() {
         return true;
     }
 
+
     if (iter->first == "lbrace"){
         setLexem();
         nextState(1);
         addString("lbrace StmtList");
-        tempHeight = treeHeight;
-        if (!StmtList()) return false;
+        if (!StmtList()) {return false; }
 //        cout << "LL" << iter->second << endl;
-        if (iter->first != "rbrace") return false;
+        if (iter->first != "rbrace") {return false; }
         setLexem();
         nextState(0);
         addString("rbrace");
@@ -495,8 +463,8 @@ bool LL::Stmt() {
         nextState(1);
         addString("kwreturn E");
 
-        if (!E()) return false;
-        if (iter->first != "semicolon") return false;
+        if (!E()) {return false; }
+        if (iter->first != "semicolon") {return false; }
 
         nextState(0);
         addString("semicolon");
@@ -532,7 +500,7 @@ bool LL::DeclareStmt() {
 
     nextState(1);
     addString("Type");
-    if (!Type()) return false;
+    if (!Type()) {return false; }
     backStateIt();
     if (iter->first != "id") return false;
     nextState(0);
@@ -554,13 +522,10 @@ bool LL::DeclareStmtList() {
         if (!ParamList()) return false;
         if (iter->first != "rpar") return false;
         setLexem();
-        nextState(1);
-        addString("rpar");
-        backStateIt();
         if (iter->first != "lbrace") return false;
         setLexem();
         nextState(1);
-        addString("lbrace StmtList");
+        addString("rpar lbrace StmtList");
         if (!StmtList()) return false;
         if (iter->first != "rbrace") return false;
         setLexem();
@@ -572,13 +537,12 @@ bool LL::DeclareStmtList() {
     }
     else if (iter->first == "opassign"){
         setLexem();
-        nextState(1);
-        addString("opassign");
-        backStateIt();
+
         if (iter->first == "num"){
+            auto num = iter->second;
             setLexem();
             nextState(1);
-            addString(" " + iter->second + " DeclareVarList");
+            addString("opassign " + num + " DeclareVarList");
             if(!DeclareVarList()) return false;
             if (iter->first != "semicolon") return false;
             setLexem();
@@ -590,9 +554,10 @@ bool LL::DeclareStmtList() {
         }
 
         else if (iter->first == "char"){
+            auto item = iter->second;
             setLexem();
             nextState(1);
-            addString(" " + iter->second + " DeclareVarList");
+            addString("opassign " + item + " DeclareVarList");
             if(!DeclareVarList()) return false;
             if (iter->first != "semicolon") return false;
             setLexem();
@@ -624,12 +589,10 @@ bool LL::DeclareVarList() {
 
     if (iter->first == "comma") {
         setLexem();
-        nextState(1);
-        addString("comma");
-        backStateIt();
+
         if (iter->first != "id") return false;
         nextState(1);
-        addString(" " + iter->second + " InitVar");
+        addString("comma " + iter->second + " InitVar");
         setLexem();
         if (!InitVar()) return false;
         backStateIt();
@@ -648,12 +611,10 @@ bool LL::InitVar() {
 
     if (iter->first == "opassign"){
         setLexem();
-        nextState(1);
-        addString("opassign");
-        backStateIt();
+
         if (iter->first != "num" and iter->first != "char") return false;
         nextState(0);
-        addString(" " + iter->second);
+        addString("opassign " + iter->second);
         setLexem();
         backStateIt();
         return true;
@@ -710,14 +671,22 @@ bool LL::ParamListList() {
 // ArgList
 bool LL::Arglist() {
     //if (iter == list.end()) cout << "!!!!!!!!!!!!!!!!" << endl;
-    if (iter->first == "id"){
-        nextState(0);
-        addString(iter->second + " ArgList'");
-        //cout << iter->first << iter->second << endl;
+    auto tempIt = iter;
+    auto tempHeight = treeHeight;
 
-        setLexem();
-        auto tempIt = statesIt;
+    nextState(1);
+    addString("E");
+    if (E()){
+        nextState(0);
+        addString("ArgList'");
+        //cout << iter->first << iter->second << endl;
         if (!ArgListList()) {return false; }
+    }
+    else {
+        output.erase(output.end() - treeHeight + tempHeight, output.end());
+        for (int i = 0; i < treeHeight - tempHeight; i++) backStateIt();
+        treeHeight = tempHeight;
+        iter = tempIt;
     }
     backStateIt();
     return true;
@@ -725,18 +694,25 @@ bool LL::Arglist() {
 
 bool LL::ArgListList() {
     if (iter->first == "comma"){
-        auto tempIt = statesIt;
-
+        auto tempItemIt = iter;
+        auto tempHeight = treeHeight;
         nextState(1);
-        addString("comma");
+        addString("comma E");
         setLexem();
-        backStateIt();
-        nextState(0);
-        if (iter->first != "id") {return false; }
-        addString(iter->second + " ArgList'");
-        setLexem();
-        tempIt = statesIt;
-        if (!ArgListList()) {return false; }
+
+
+        if (E()) {
+            nextState(0);
+            addString(" ArgList'");
+            if (!ArgListList()) { return false; }
+            backStateIt();
+            return true;
+        }
+        else {
+            output.erase(output.end() - treeHeight + tempHeight, output.end());
+            treeHeight = tempHeight;
+            iter = tempItemIt;
+        }
     }
     backStateIt();
     return true;
@@ -762,7 +738,7 @@ bool LL::AssignOrCallOp() {
 bool LL::AssignOrCall() {
     if (iter->first != "id") return false;
     nextState(0);
-    addString(iter->second + " AssignOrCall' ");
+    addString(iter->second + " AssignOrCall'");
     setLexem();
     if (!AssignOrCallList()) return false;
     backStateIt();
@@ -799,13 +775,11 @@ bool LL::WhileOp() {
     addString("WhileOp");
     if (iter->first != "kwwhile") return false;
     setLexem();
-    nextState(1);
-    addString("kwwhile");
-    backStateIt();
+
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
-    addString("lpar E");
+    addString("kwwhile lpar E");
     if (!E()) return false;
     if (iter->first != "rpar") return false;
     setLexem();
@@ -825,13 +799,11 @@ bool LL::ForOp() {
 
     if (iter->first != "kwfor") return false;
     setLexem();
-    nextState(1);
-    addString("kwfor");
-    backStateIt();
+
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
-    addString("lpar ForInit");
+    addString("kwfor lpar ForInit");
     ForInit();
     if (iter->first != "semicolon") return false;
     setLexem();
@@ -895,12 +867,10 @@ bool LL::ForExp() {
 bool LL::ForLoop() {
     if (iter->first == "opinc"){
         setLexem();
-        nextState(1);
-        addString("opinc");
-        backStateIt();
+
         if (iter->first != "id") return false;
         nextState(0);
-        addString(iter->second);
+        addString("opinc " + iter->second);
         setLexem();
         backStateIt();
         backStateIt();
@@ -919,13 +889,11 @@ bool LL::IfOp() {
 
     if (iter->first != "kwif") return false;
     setLexem();
-    nextState(1);
-    addString("kwif");
-    backStateIt();
+
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
-    addString("lpar E");
+    addString("kwif lpar E");
     if (!E()) return false;
     if (iter->first != "rpar") return false;
     setLexem();
@@ -963,23 +931,19 @@ bool LL::SwitchOp() {
 
     if (iter->first != "kwswitch") return false;
     setLexem();
-    nextState(0);
-    addString("kwswitch");
-    backStateIt();
+
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
-    addString("lpar E");
+    addString("kwswitch lpar E");
     if (!E()) return false;
     if (iter->first != "rpar") return false;
     setLexem();
-    nextState(1);
-    addString("rpar");
-    backStateIt();
+
     if (iter->first != "lbrace") return false;
     setLexem();
     nextState(1);
-    addString("lbrace Cases");
+    addString("lpar lbrace Cases");
 
     if (!Cases()) return false;
     if (iter->first != "rbrace") return false;
@@ -1030,32 +994,27 @@ bool LL::CasesList() {
 bool LL::ACase() {
     if (iter->first == "kwcase"){
         setLexem();
-        nextState(1);
-        addString("kwcase");
-        backStateIt();
+
         if (iter->first == "num" or iter->first == "char"){
+            auto item = iter->second;
             setLexem();
-            nextState(1);
-            addString(" " + iter->second);
-            backStateIt();
+
             if (iter->first != "colon") return false;
             setLexem();
             nextState(0);
-            addString("colon StmtList");
+            addString("kwcase" + item + "colon StmtList");
             if (!StmtList()) return false;
             return true;
         }
-        else return false;
+
     }
-    else if (iter->first == "default"){
+    else if (iter->first == "kwdefault"){
         setLexem();
-        nextState(1);
-        addString("kwdefault");
-        backStateIt();
+
         if (iter->first != "colon") return false;
         setLexem();
         nextState(0);
-        addString("colon StmtList");
+        addString("kwdefault colon StmtList");
         if (!StmtList()) return false;
         return true;
     }
@@ -1067,20 +1026,16 @@ bool LL::IOp() {
     if (iter->first != "kwin") return false;
     setLexem();
     nextState(0);
-    addString("IfOp");
+    addString("IOp");
 
-    nextState(1);
-    addString("kwin");
-    backStateIt();
     if (iter->first != "id") return false;
+    auto item = iter->second;
     setLexem();
-    nextState(1);
-    addString(" " + iter->second);
-    backStateIt();
+
     if (iter->first != "semicolon") return false;
     setLexem();
     nextState(0);
-    addString("semicolon");
+    addString("kwin" + item + "semicolon");
     backStateIt();
     backStateIt();
     backStateIt();
@@ -1094,14 +1049,30 @@ bool LL::OOp() {
     addString("OOp");
 
     nextState(1);
-    addString("kwout E");
-    if (!E()) return false;
+    addString("kwout OOp'");
+    if (!OOpList()) return false;
     if (iter->first != "semicolon") return false;
     setLexem();
     nextState(0);
     addString("semicolon");
     backStateIt();
     backStateIt();
+    backStateIt();
+    return true;
+}
+
+bool LL::OOpList() {
+    if (iter->first == "str"){
+        nextState(0);
+        addString(iter->second);
+        setLexem();
+        backStateIt();
+        backStateIt();
+        return true;
+    }
+    nextState(0);
+    addString("E");
+    if (!E()) return false;
     backStateIt();
     return true;
 }
