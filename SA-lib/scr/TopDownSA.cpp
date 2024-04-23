@@ -19,7 +19,7 @@ void LL::solve() {
     if (f) {
         for (const auto &now: output) {
             outStr << now << endl;
-            cout << now << endl;
+            //cout << now << endl;
         }
         outStr << endl << "Result: Accept" << endl;
     }
@@ -371,7 +371,9 @@ bool LL::Stmt() {
 
     if (DeclareStmt()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         backStateIt();
         treeHeight = tempHeight;
         iter = listIt;
@@ -379,7 +381,9 @@ bool LL::Stmt() {
 
     if (AssignOrCallOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         backStateIt();
         treeHeight = tempHeight;
         iter = listIt;
@@ -387,7 +391,9 @@ bool LL::Stmt() {
 
     if (WhileOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         backStateIt();
         backStateIt();
         treeHeight = tempHeight;
@@ -396,7 +402,9 @@ bool LL::Stmt() {
 
     if (ForOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         backStateIt();
         treeHeight = tempHeight;
         iter = listIt;
@@ -404,7 +412,9 @@ bool LL::Stmt() {
 
     if (IfOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         backStateIt();
         treeHeight = tempHeight;
         iter = listIt;
@@ -412,7 +422,9 @@ bool LL::Stmt() {
 
     if (SwitchOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         backStateIt();
         treeHeight = tempHeight;
         iter = listIt;
@@ -420,14 +432,18 @@ bool LL::Stmt() {
 
     if (IOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         treeHeight = tempHeight;
         iter = listIt;
     }
 
     if (OOp()) return true;
     else {
-        for (int i = 0; i < treeHeight - tempHeight; i++) output.pop_back();
+        for (int i = 0; i < treeHeight - tempHeight; i++) {
+            //if (output.end() == output.begin()) break;
+            output.pop_back(); }
         treeHeight = tempHeight;
         iter = listIt;
     }
@@ -931,7 +947,6 @@ bool LL::SwitchOp() {
 
     if (iter->first != "kwswitch") return false;
     setLexem();
-
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
@@ -946,6 +961,7 @@ bool LL::SwitchOp() {
     addString("lpar lbrace Cases");
 
     if (!Cases()) return false;
+    //cout << 1 << endl;
     if (iter->first != "rbrace") return false;
     setLexem();
     nextState(0);
@@ -961,6 +977,7 @@ bool LL::Cases() {
     addString("Acase");
     if (!ACase()) return false;
     backStateIt();
+    //cout << 2 << endl;
     nextState(0);
     addString("CasesList");
     if (!CasesList()) return false;
@@ -994,10 +1011,10 @@ bool LL::CasesList() {
 bool LL::ACase() {
     if (iter->first == "kwcase"){
         setLexem();
-
         if (iter->first == "num" or iter->first == "char"){
             auto item = iter->second;
             setLexem();
+            //cout << iter->first << endl;
 
             if (iter->first != "colon") return false;
             setLexem();

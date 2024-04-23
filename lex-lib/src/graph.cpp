@@ -21,6 +21,7 @@ unordered_map<int, vector<E>> graph = {
            {"[", 1, false, false, ""},
            {"]", 1, false, false, ""},
            {";", 1, false, false, ""},
+           {":", 1, false, false, ""},
            {",", 1, false, false, ""},
            {".", 1, false, false, ""},
            {">", 1, false, false, ""},
