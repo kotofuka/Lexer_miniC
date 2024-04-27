@@ -1,7 +1,5 @@
 int main (){
-    switch (a){
-        case 1: a = b;
-    }
-
-    return 0;
+   switch (1){
+    case 1: return a;
+   }
 }
