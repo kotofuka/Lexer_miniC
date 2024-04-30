@@ -72,6 +72,67 @@ void LL::addString(const std::string &str) {
     output.push_back(outputString + str);
     //cout << outputString + str << endl;
 }
+//semantic func
+string LL::newLabel() {
+    string label = "L" + to_string(labelCounter);
+    labelCounter++;
+    return label;
+}
+
+string LL::alloc(const string &scope) {
+    codeCounter++;
+    table.push_back({to_string(codeCounter), "$T" + to_string(tempVarCounter), "var"});
+    return to_string(codeCounter);
+}
+
+string LL::addVar(const std::string &name, const string &scope, const std::string type, const std::string &init) {
+    bool fl = false;
+    for (auto now: table) {
+        if (now.name == name and now.scope == scope){
+            fl = true;
+            break;
+        }
+    }
+    if (fl) return "$Error";
+    codeCounter++;
+    table.push_back({to_string(codeCounter), name, "var", type, "-1", init, scope});
+    return to_string(codeCounter);
+}
+
+string LL::addFunc(const std::string &name, const std::string &type) {
+    bool fl = false;
+    for (auto now: table){
+        if (now.name == name){
+            fl = true;
+            break;
+        }
+    }
+    if (fl) return "$Error";
+    codeCounter++;
+    table.push_back({to_string(codeCounter), name, "func", type});
+    return to_string(codeCounter);
+}
+
+string LL::checkVar(const std::string &scope, const std::string &name) {
+    string tempCode = "$Error";
+    for (auto  now: table){
+        if ((now.scope == scope or now.scope == "-1") and now.name == name and now.kind == "var"){
+            if (now.scope == scope){
+                tempCode = now.code;
+                break;
+            }
+            tempCode = now.code;
+        }
+    }
+    return tempCode;
+}
+
+string LL::checkFunc(const std::string &name, const std::string &len) {
+    for (auto now: table){
+        if (now.scope == "-1" and now.name == name and now.kind == "func" and now.len == len)return now.code;
+    }
+    return "$Error";
+}
 //
 //Expression Grammer
 bool LL::E() {

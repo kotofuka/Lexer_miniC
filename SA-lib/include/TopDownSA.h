@@ -12,6 +12,7 @@
 #include <iostream>
 
 using namespace std;
+using PBS = pair<bool, string>;
 
 class LL {
 private:
@@ -115,7 +116,6 @@ private:
     void nextState(const int& state);
     void backStateIt();
     void addString(const string& str);
-    void backLexem(const Lexem& token);
 
     Lexer lexer;
     Lexem tempLexem;
@@ -132,6 +132,41 @@ private:
     string outPath;
 
     vector<string> output;
+    //
+    //semantic block
+    string newLabel();
+    string alloc(const string & scope);
+    string addVar(const string& name, const string& scope, const string type, const string& init = "0");
+    string addFunc(const string& name, const string& type);
+    string checkVar(const string& scope, const string& name);
+    string checkFunc(const string& name, const string& len);
+
+    struct object{
+        string code;
+        string name;
+        string kind;
+        string type = "None";
+        string len = "-1";
+        string value = "None";
+        string scope = "-1";
+    };
+
+    vector<object> table;
+    int labelCounter;
+    int codeCounter;
+    int tempVarCounter;
+    //
+    //atom block
+    struct atom{
+        string operation;
+        string first;
+        string second;
+        string third;
+    };
+    vector<atom> atomList;
+    vector<string> outputAtomList;
+    //
+
 public:
     void solve ();
 
