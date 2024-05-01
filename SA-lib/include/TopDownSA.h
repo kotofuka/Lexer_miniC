@@ -10,106 +10,108 @@
 #include <Lexer.h>
 #include <stack>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 using PBS = pair<bool, string>;
+using ST = const string&;
 
 class LL {
 private:
 
     // Expression Grammer
-    bool E();
+    PBS E(ST scope);
 
-    bool E7();
+    PBS E7(ST scope);
 
-    bool E7list();
+    PBS E7list(ST scope, ST p);
 
-    bool E6();
+    PBS E6(ST scope);
 
-    bool E6list();
+    PBS E6list(ST scope, ST p);
 
-    bool E5();
+    PBS E5(ST scope);
 
-    bool E5list();
+    PBS E5list(ST scope, ST p);
 
-    bool E4();
+    PBS E4(ST scope);
 
-    bool E4list();
+    PBS E4list(ST scope, ST p);
 
-    bool E3();
+    PBS E3(ST scope);
 
-    bool E3list();
+    PBS E3list(ST scope, ST p);
 
-    bool E2();
+    PBS E2(ST scope);
 
-    bool E1();
+    PBS E1(ST scope);
 
-    bool E1List();
+    PBS E1List(ST scope, ST p);
     //
     //Entry point
-    bool StmtList();
+    bool StmtList(ST scope);
 
-    bool Stmt();
+    bool Stmt(ST scope);
     //
     //Declare block
-    bool Type();
+    PBS Type(ST scope);
 
-    bool DeclareStmt();
+    bool DeclareStmt(ST scope);
 
-    bool DeclareStmtList();
+    bool DeclareStmtList(ST scope, ST p, ST q);
 
-    bool DeclareVarList();
+    bool DeclareVarList(ST scope, ST p);
 
-    bool InitVar();
+    bool InitVar(ST scope, ST p, ST q);
 
-    bool ParamList();
+    PBS ParamList(ST scope);
 
-    bool ParamListList();
+    PBS ParamListList(ST scope);
     //
     // Assign or Call operation block
-    bool AssignOrCallOp();
+    bool AssignOrCallOp(ST scope);
 
-    bool AssignOrCall();
+    bool AssignOrCall(ST scope);
 
-    bool AssignOrCallList();
+    bool AssignOrCallList(ST scope, ST p);
     //
     // while block
-    bool WhileOp();
+    bool WhileOp(ST scope);
     //
     // block "ForOp"
-    bool ForOp();
+    bool ForOp(ST scope);
 
-    bool ForInit();
+    bool ForInit(ST scope);
 
-    bool ForExp();
+    PBS ForExp(ST scope);
 
-    bool ForLoop();
+    bool ForLoop(ST scope);
     //
     // block "IfOp"
-    bool IfOp();
+    bool IfOp(ST scope);
 
-    bool ElsePart();
+    bool ElsePart(ST scope);
     //
     // block "SwitchOp"
-    bool SwitchOp();
+    bool SwitchOp(ST scope);
 
-    bool Cases();
+    bool Cases(ST scope, ST p, ST end);
 
-    bool CasesList();
+    bool CasesList(ST scope, ST p, ST end, ST def);
 
-    bool ACase();
+    PBS ACase(ST scope, ST p, ST end);
     //
     // block "IN" and "OUT"
-    bool IOp();
+    bool IOp(ST scope);
 
-    bool OOp();
+    bool OOp(ST scope);
 
-    bool OOpList();
+    bool OOpList(ST scope);
     //
     // ArgList
-    bool Arglist();
+    PBS Arglist(ST scope);
 
-    bool ArgListList();
+    PBS ArgListList(ST scope);
     //
     // Other funcs
     void setLexem();
@@ -145,30 +147,33 @@ private:
         string code;
         string name;
         string kind;
-        string type = "None";
+        string type = "kwint";
         string len = "-1";
-        string value = "None";
+        string value = "0";
         string scope = "-1";
     };
 
     vector<object> table;
-    int labelCounter;
-    int codeCounter;
-    int tempVarCounter;
+    int labelCounter = 0;
+    int codeCounter = 0;
+    int tempVarCounter = 0;
     //
     //atom block
     struct atom{
-        string operation;
-        string first;
-        string second;
-        string third;
+        string scope = "-1";
+        string operation = "";
+        string first = "";
+        string second = "";
+        string third = "";
     };
+
+    void addAtom(atom data);
     vector<atom> atomList;
-    vector<string> outputAtomList;
+    string outPathAtom;
     //
 
 public:
     void solve ();
 
-    explicit LL(Lexer& lexer, const string&);
+    explicit LL(Lexer& lexer, const string&, ST);
 };

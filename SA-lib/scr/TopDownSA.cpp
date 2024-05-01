@@ -4,8 +4,9 @@
 
 #include <TopDownSA.h>
 
-LL::LL(Lexer &lexer, const std::string & outPathstr): lexer(lexer){
+LL::LL(Lexer &lexer, const std::string & outPathstr, ST outputAtoms): lexer(lexer){
     outPath = outPathstr;
+    outPathAtom = outputAtoms;
 }
 
 void LL::solve() {
@@ -14,7 +15,7 @@ void LL::solve() {
     nextState(0);
     addString("StmtList");
 
-    bool f = StmtList() and *iter == LEX_EOF;
+    bool f = StmtList("-1") and *iter == LEX_EOF;
     outStr.open(outPath);
     if (f) {
         for (const auto &now: output) {
@@ -26,6 +27,20 @@ void LL::solve() {
     else outStr << endl << "Result: Error" << endl;
 
     outStr.close();
+    ofstream outAtoms;
+    outAtoms.open(outPathAtom);
+    for (auto  now : atomList){
+        outAtoms << "(" << now.operation << ", " << now.first << ", " << now.second << ", " <<
+        now.third << ")" << endl;
+    }
+
+    outAtoms << endl << endl << "=========================================" << endl;
+    outAtoms << "Code  :  Name  :  Kind  :  Type  :  Init  :  Len  :Scope" << endl;
+
+    for (auto now: table){
+        outAtoms << now.code + " " + now.name + " " + now.kind + " " + now.type + " " + now.value + " " + now.len + " " + now.scope << endl;
+    }
+
     return;
 }
 //
@@ -74,15 +89,14 @@ void LL::addString(const std::string &str) {
 }
 //semantic func
 string LL::newLabel() {
-    string label = "L" + to_string(labelCounter);
+    string label = to_string(labelCounter);
     labelCounter++;
     return label;
 }
 
 string LL::alloc(const string &scope) {
-    codeCounter++;
-    table.push_back({to_string(codeCounter), "$T" + to_string(tempVarCounter), "var"});
-    return to_string(codeCounter);
+    tempVarCounter++;
+    return addVar("$T" + to_string(tempVarCounter), scope, "kwint");
 }
 
 string LL::addVar(const std::string &name, const string &scope, const std::string type, const std::string &init) {
@@ -95,8 +109,8 @@ string LL::addVar(const std::string &name, const string &scope, const std::strin
     }
     if (fl) return "$Error";
     codeCounter++;
-    table.push_back({to_string(codeCounter), name, "var", type, "-1", init, scope});
-    return to_string(codeCounter);
+    table.push_back({"'" + to_string(codeCounter) + "'", name, "var", type, "-1", init, scope});
+    return "'" + to_string(codeCounter) + "'";
 }
 
 string LL::addFunc(const std::string &name, const std::string &type) {
@@ -109,7 +123,7 @@ string LL::addFunc(const std::string &name, const std::string &type) {
     }
     if (fl) return "$Error";
     codeCounter++;
-    table.push_back({to_string(codeCounter), name, "func", type});
+    table.push_back({"'" + to_string(codeCounter) + "'", name, "func", type});
     return to_string(codeCounter);
 }
 
@@ -134,256 +148,345 @@ string LL::checkFunc(const std::string &name, const std::string &len) {
     return "$Error";
 }
 //
-//Expression Grammer
-bool LL::E() {
-    nextState(0);
-    addString("E7");
-
-    if (!E7()) {return false; }
-    backStateIt();
-    return true;
+// Atom func
+void LL::addAtom(LL::atom data) {
+    if (atomList.size() == 1 and atomList[0].scope == "$Error") return;
+    if (data.scope == "$Error" or data.operation == "$Error" or data.first == "$Error" or data.second == "$Error" or data.third == "$Error"){
+        atomList.clear();
+        atomList.push_back({"$Error", "$Error", "$Error", "$Error", "$Error"});
+    }
+    atomList.push_back(data);
+    return;
 }
 
-bool LL::E7(){
+//
+//Expression Grammer
+PBS LL::E(ST scope) {
+    nextState(0);
+    addString("E7");
+    auto result = E7(scope);
+    if (!result.first) {return {false, ""}; }
+    backStateIt();
+    return {true, result.second};
+}
+
+PBS LL::E7(ST scope){
 
     nextState(1);
     addString("E6");
-
-    if (!E6()) {return false; }
+    auto result = E6(scope);
+    if (!result.first) {return {false, ""}; }
 
     nextState(0);
     addString("E7\'");
-    if (!E7list()) {return false; }
+    result = E7list(scope, result.second);
+    if (!result.first) {return {false, ""}; }
     backStateIt();
-    return true;
+    return {true, result.second};
 }
 
-bool LL::E7list(){
+PBS LL::E7list(ST scope, ST p){
     if (iter->first == "opor"){
         setLexem();
 
         nextState(1);
         addString("opor E6");
 
-        if (!E6()) {return false; }
+        auto result = E6(scope);
+        if (!result.first) return {false, ""};
         nextState(0);
         addString("E7\'");
-        if (!E7list()) {return false; }
+
+        auto s = alloc(scope);
+        addAtom({scope, "OR", p, result.second, s});
+
+        result = E7list(scope, s);
+        if (!result.first) {return {false, ""}; }
+        backStateIt();
+        return {true, result.second};
     }
     backStateIt();
-    return true;
+    return {true, p};
 }
 
-bool LL::E6(){
+PBS LL::E6(ST scope){
     nextState(1);
     addString("E5");
 
-    if (!E5()) {return false; }
+    auto result = E5(scope);
+    if (!result.first) {return {false, ""}; }
 
     nextState(0);
     addString("E6\'");
 
-    if (!E6list()) {return false;}
+    result = E6list(scope, result.second);
+    if (!result.first) {return {false, ""};}
     backStateIt();
-    return true;
+    return {true, result.second};
 }
 
-bool LL::E6list(){
+PBS LL::E6list(ST scope, ST p){
     if (iter->first == "opand"){
         setLexem();
 
         nextState(1);
         addString("opand E5");
 
-        if (!E5()) {return false; }
+        auto result = E5(scope);
+        if (!result.first) {return {false, ""}; }
 
         nextState(0);
         addString("E6\'");
 
-        if (!E6list()) {return false; }
+        auto s = alloc(scope);
+        addAtom({scope, "AND", p, result.second, s});
+
+        result = E6list( scope, s);
+        if (!result.first) {return {false, ""}; }
+        backStateIt();
+        return {true, result.second};
     }
     backStateIt();
-    return true;
+    return {true, p};
 }
 
-bool LL::E5(){
+PBS LL::E5(ST scope){
 
     nextState(1);
     addString("E4");
 
-    if (!E4()) {return false; }
+    auto result = E4(scope);
+    if (!result.first) {return {false, ""}; }
 
     nextState(0);
     addString("E5\'");
 
-    if (!E5list()) {return false; }
+    result = E5list(scope, result.second);
+    if (!result.first) {return {false, ""}; }
     backStateIt();
-    return true;
+    return {true, result.second};
 }
 
-bool LL::E5list(){
+PBS LL::E5list(ST scope, ST p){
     if (iter->first == "opeq" or iter->first == "opne" or iter->first == "oplt" or iter->first == "opgt" or
             iter->first == "ople"){
+        auto item = iter->first.substr(2, iter->first.size());
+        transform(item.begin(), item.end(), item.begin(), ::toupper);
         nextState(0);
         addString(iter->first + " E4");
         setLexem();
 
-        if (!E4()) {return false; }
+        auto result = E4(scope);
+        if (!result.first) {return {false, ""}; }
+
+        auto l = newLabel();
+        auto s = alloc(scope);
+        addAtom({scope, "MOV", "1", "", s});
+        addAtom({scope, item, p, result.second, "L" + l});
+        addAtom({scope, "MOV", "0", "", s});
+        addAtom({scope, "LBL", "", "", "L" + l});
+
+        backStateIt();
+        return {true, s};
     }
     backStateIt();
-    return true;
+    return {true, p};
 }
 
-bool LL::E4(){
+PBS LL::E4(ST scope){
 
     nextState(1);
     addString("E3");
 
-    if (!E3()) {return false; }
+    auto result = E3(scope);
+    if (!result.first) {return {false, ""}; }
 
     nextState(0);
     addString("E4\'");
 
-    if (!E4list()) {return false; }
+    result = E4list(scope, result.second);
+    if (!result.first) {return {false, ""}; }
     backStateIt();
-    return true;
+    return {true, result.second};
 }
 
-bool LL::E4list(){
+PBS LL::E4list(ST scope, ST p){
     if (iter->first == "opplus" or iter->first == "opminus"){
+        auto item = iter->first == "opplus" ? "ADD": "SUB";
         nextState(1);
         addString(iter->first + " E3");
         setLexem();
 
-
-        if (!E3()) {return false; }
+        auto result = E3(scope);
+        if (!result.first) {return {false, ""}; }
 
         nextState(0);
         addString("E4\'");
 
-        if (!E4list()) {return false; }
+        auto s = alloc(scope);
+        addAtom({scope, item, p, result.second, s});
+
+        result = E4list(scope, s);
+        if (!result.first) {return {false, ""}; }
+
+        backStateIt();
+        return {true, result.second};
     }
     backStateIt();
-    return true;
+    return {true, p};
 }
 
-bool LL::E3(){
+PBS LL::E3(ST scope){
 
     nextState(1);
     addString("E2");
 
-    if (!E2()) {return false; }
+    auto result = E2(scope);
+    if (!result.first) {return {false, ""}; }
 
     nextState(0);
     addString("E3\'");
 
-    if (!E3list()) {return false; }
+    result = E3list(scope, result.second);
+    if (!result.first) {return {false, ""}; }
     backStateIt();
-    return true;
+    return {true, result.second};
 }
 
-bool LL::E3list(){
+PBS LL::E3list(ST scope, ST p){
     if (iter->first == "opmul"){
         setLexem();
 
         nextState(1);
         addString("opmul E2");
 
-        if (!E2()) {return false; }
+        auto result = E2(scope);
+        if (!result.first) {return {false, ""}; }
 
         nextState(0);
         addString("E3\'");
 
-        if (!E3list()) {return false; }
+        auto s = alloc(scope);
+        addAtom({scope, "MUL", p, result.second, s});
+
+        result = E3list(scope, s);
+        if (!result.first) {return {false, ""}; }
+
+        backStateIt();
+        return {true, result.second};
     }
     backStateIt();
-    return true;
+    return {true, p};
 }
 
-bool LL::E2(){
+PBS LL::E2(ST scope){
     if (iter->first == "opnot"){
         setLexem();
         nextState(0);
         addString("opnot E1");
 
-        if (!E1()){return false;}
+        auto result = E1(scope);
+        if (!result.first){return {false, ""};}
         backStateIt();
-        return true;
+
+        auto r = alloc(scope);
+        addAtom({scope, "NOT", result.second, "", r});
+        return {true, r};
     }
-    else{
+    else {
         nextState(0);
         addString("E1");
 
-        if (!E1()){return false;}
+        auto result = E1(scope);
+        if (!result.first) { return {false, ""}; }
+
+        backStateIt();
+        return {true, result.second};
     }
-    backStateIt();
-    return true;
 }
 
-bool LL::E1(){
+PBS LL::E1(ST scope){
     if (iter->first == "opinc"){
         setLexem();
 
-        if (iter->first != "id") {return false; }
+        if (iter->first != "id") {return {false, ""}; }
+
+        auto q = checkVar(scope, iter->second);
+        addAtom({scope, "ADD", q, "1", q});
+
         nextState(0);
         addString("opinc " + iter->second);
         backStateIt();
         backStateIt();
 
         setLexem();
-        return true;
+        return {true, q};
     }
     else if (iter->first == "num" or iter->first == "char"){
+        auto item = iter->second;
+
         nextState(0);
         addString(iter->second);
         setLexem();
         backStateIt();
         backStateIt();
-        return true;
+
+        return {true, item};
     }
     else if (iter->first == "lpar"){
         setLexem();
         nextState(1);
         addString("lpar E");
 
-        if (!E()) {return false; }
+        auto result = E(scope);
+        if (!result.first) {return {false, ""}; }
 
         nextState(0);
         addString("rpar");
-        if (iter->first != "rpar") {return false; }
+        if (iter->first != "rpar") {return {false, ""}; }
         backStateIt();
         backStateIt();
         setLexem();
-        return true;
+        return {true, result.second};
     }
     else if (iter->first == "id"){
+        auto name = iter->second;
+
         nextState(0);
-        addString(iter->second + " E1\'");
+        addString(name + " E1\'");
         setLexem();
-        if (!E1List()) {return false; }
+
+        auto result = E1List(scope, name);
+        if (!result.first) {return {false, ""}; }
         backStateIt();
-        return true;
+        return {true, result.second};
     }
 
-    return false;
+    return {false, ""};
 }
 
-bool LL::E1List() {
+PBS LL::E1List(ST scope, ST p) {
     if (iter->first == "lpar"){
         setLexem();
 
         nextState(1);
         addString("lpar Arglist");
 
-        if (!Arglist()) {return false; }
+        auto result = Arglist(scope);
+        if (!result.first) {return {false, ""}; }
 
         nextState(0);
         addString("rpar");
-        if (iter->first != "rpar") {return false; }
+        if (iter->first != "rpar") {return {false, ""}; }
         setLexem();
         backStateIt();
         backStateIt();
-        return true;
+
+        auto s = checkFunc(p, result.second);
+        auto r = alloc(scope);
+        addAtom({scope, "CALL", s, "", r});
+
+        return {true, r};
     }
     else if (iter->first == "opinc") {
         setLexem();
@@ -392,19 +495,27 @@ bool LL::E1List() {
         addString("opinc");
         backStateIt();
         backStateIt();
+
+        auto s = checkVar(scope, p);
+        auto r = alloc(scope);
+        addAtom({scope, "MOV", s, "", r});
+        addAtom({scope, "ADD", s, "1", s});
+
+        return {true, r};
     }
     backStateIt();
-    return true;
+    auto q = checkVar(scope, p);
+    return {true, q};
 }
 
 //Entry point
-bool LL::StmtList() {
+bool LL::StmtList(ST scope) {
     if (*iter == LEX_EOF) return true;
 
     nextState(1);
     addString("Stmt");
     auto listIt = iter;
-    if (!Stmt()){
+    if (!Stmt(scope)){
         iter = listIt;
         backStateIt();
         backStateIt();
@@ -413,78 +524,19 @@ bool LL::StmtList() {
     }
     nextState(0);
     addString("StmtList");
-    if (!StmtList()) return false;
+    if (!StmtList(scope)) return false;
     backStateIt();
     return true;
 }
 
-bool LL::Stmt() {
+bool LL::Stmt(ST scope) {
     if (*iter == LEX_EOF) return false;
 
     if (iter->first == "kwint" or iter->first == "kwchar"){
         nextState(0);
         addString("DeclareStmt");
 
-        if (!DeclareStmt()) return false;
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "id"){
-        nextState(0);
-        addString("AssignOrCallOp");
-
-        if (!AssignOrCallOp()) return false;
-
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "kwwhile"){
-        nextState(0);
-        addString("kwwhile WhileOp");
-
-        if (!WhileOp()) return false;
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "kwfor"){
-        nextState(0);
-        addString("kwfor ForOp");
-        if (!ForOp()) return false;
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "kwif"){
-        nextState(0);
-        addString("kwif IfOp");
-        if (!IfOp()) return false;
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "kwswitch"){
-        nextState(0);
-        addString("kwswitch SwitchOp");
-        if (!SwitchOp()) return false;
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "kwin"){
-        nextState(0);
-        addString("kwin IOp");
-        if (!IOp()) return false;
-        backStateIt();
-        return true;
-    }
-
-    if (iter->first == "kwout"){
-        nextState(0);
-        addString("kwout OOp");
-        if (!OOp()) return false;
+        if (!DeclareStmt(scope)) return false;
         backStateIt();
         return true;
     }
@@ -498,12 +550,72 @@ bool LL::Stmt() {
         return true;
     }
 
+    if (scope == "-1") return false;
+
+    if (iter->first == "id"){
+        nextState(0);
+        addString("AssignOrCallOp");
+
+        if (!AssignOrCallOp(scope)) return false;
+
+        backStateIt();
+        return true;
+    }
+
+    if (iter->first == "kwwhile"){
+        nextState(0);
+        addString("kwwhile WhileOp");
+
+        if (!WhileOp(scope)) return false;
+        backStateIt();
+        return true;
+    }
+
+    if (iter->first == "kwfor"){
+        nextState(0);
+        addString("kwfor ForOp");
+        if (!ForOp(scope)) return false;
+        backStateIt();
+        return true;
+    }
+
+    if (iter->first == "kwif"){
+        nextState(0);
+        addString("kwif IfOp");
+        if (!IfOp(scope)) return false;
+        backStateIt();
+        return true;
+    }
+
+    if (iter->first == "kwswitch"){
+        nextState(0);
+        addString("kwswitch SwitchOp");
+        if (!SwitchOp(scope)) return false;
+        backStateIt();
+        return true;
+    }
+
+    if (iter->first == "kwin"){
+        nextState(0);
+        addString("kwin IOp");
+        if (!IOp(scope)) return false;
+        backStateIt();
+        return true;
+    }
+
+    if (iter->first == "kwout"){
+        nextState(0);
+        addString("kwout OOp");
+        if (!OOp(scope)) return false;
+        backStateIt();
+        return true;
+    }
 
     if (iter->first == "lbrace"){
         setLexem();
         nextState(1);
         addString("lbrace StmtList");
-        if (!StmtList()) {return false; }
+        if (!StmtList(scope)) {return false; }
 //        cout << "LL" << iter->second << endl;
         if (iter->first != "rbrace") {return false; }
         setLexem();
@@ -520,7 +632,8 @@ bool LL::Stmt() {
         nextState(1);
         addString("kwreturn E");
 
-        if (!E()) {return false; }
+        auto result = E(scope);
+        if (!result.first) {return false; }
         if (iter->first != "semicolon") {return false; }
 
         nextState(0);
@@ -528,6 +641,8 @@ bool LL::Stmt() {
         setLexem();
         backStateIt();
         backStateIt();
+
+        addAtom({scope, "RET", "", "", result.second});
         return true;
     }
 
@@ -535,66 +650,93 @@ bool LL::Stmt() {
 }
 //
 //Declare block
-bool LL::Type() {
-    if (*iter == LEX_EOF) return false;
+PBS LL::Type(ST scope) {
+    if (*iter == LEX_EOF) return {false, ""};
 
     if (iter->first == "kwint" or iter->first == "kwchar"){
+        auto item = iter->first;
+
         nextState(0);
         addString(iter->first);
         setLexem();
         backStateIt();
         backStateIt();
-        return true;
+        return {true, item};
     }
-    return false;
+    return {false, ""};
 }
 
-bool LL::DeclareStmt() {
+bool LL::DeclareStmt(ST scope) {
     if (*iter == LEX_EOF) return false;
 
     nextState(1);
     addString("Type");
-    if (!Type()) {return false; }
+
+    auto result = Type(scope);
+    if (!result.first) {return false; }
     if (iter->first != "id") return false;
+    auto item = iter->second;
+
     nextState(0);
-    addString(" " + iter->second + " DeclareStmt'");
+    addString(" " + item + " DeclareStmt'");
     setLexem();
-    if (!DeclareStmtList()) return false;
+    if (!DeclareStmtList(scope, result.second, item)) return false;
     backStateIt();
     return true;
 
 }
 
-bool LL::DeclareStmtList() {
+bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
     if (*iter == LEX_EOF) return false;
     if (iter->first == "lpar"){
+        if (scope != "-1") return false;
         setLexem();
         nextState(1);
         addString("lpar ParamList");
-        if (!ParamList()) return false;
+
+        string codeFunc = addFunc(q, p);
+
+        auto result = ParamList(codeFunc);
+        if (!result.first) return false;
+
+
+        table[stoi(codeFunc) - 1].len = result.second;
+
         if (iter->first != "rpar") return false;
         setLexem();
         if (iter->first != "lbrace") return false;
         setLexem();
         nextState(1);
         addString("rpar lbrace StmtList");
-        if (!StmtList()) return false;
+
+        addAtom({codeFunc, "LBL", "", "", q});
+        if (!StmtList(codeFunc)) return false;
         if (iter->first != "rbrace") return false;
         setLexem();
         nextState(0);
         addString("rbrace");
         backStateIt();
         backStateIt();
+
+        addAtom({scope, "RET", "", "", "0"});
         return true;
     }
     else if (iter->first == "opassign"){
         setLexem();
+        auto item = iter->second;
 
         if (iter->first == "num"){
+            string var = addVar(q, scope, p, item);
+
+            if (var == "'$Error'") return false;
+
             nextState(1);
-            addString("opassign " + iter->second + " DeclareVarList");
+            addString("opassign " + item + " DeclareVarList");
             setLexem();
-            if(!DeclareVarList()) return false;
+
+            addAtom({scope, "MOV", item, "", var});
+
+            if(!DeclareVarList(scope, p)) return false;
             if (iter->first != "semicolon") return false;
             setLexem();
             nextState(0);
@@ -605,10 +747,14 @@ bool LL::DeclareStmtList() {
         }
 
         else if (iter->first == "char"){
+            string var = addVar(q, scope, p, item);
+            if (var == "'$Error'") return false;
+
             nextState(1);
-            addString("opassign " + iter->second + " DeclareVarList");
+            addString("opassign " + item + " DeclareVarList");
             setLexem();
-            if(!DeclareVarList()) return false;
+            addAtom({scope, "MOV", item, "", var});
+            if(!DeclareVarList(scope, p)) return false;
             if (iter->first != "semicolon") return false;
             setLexem();
             nextState(0);
@@ -620,9 +766,12 @@ bool LL::DeclareStmtList() {
         else return false;
     }
     else {
+        string var = addVar(q, scope, p);
+        if (var == "$Error")
+
         nextState(1);
         addString("DeclareVarList");
-        if (!DeclareVarList()) return false;
+        if (!DeclareVarList(scope, p)) return false;
         if (iter->first != "semicolon") return false;
         setLexem();
         nextState(0);
@@ -633,7 +782,7 @@ bool LL::DeclareStmtList() {
     }
 }
 
-bool LL::DeclareVarList() {
+bool LL::DeclareVarList(ST scope, ST p) {
     if (*iter == LEX_EOF) return false;
     //cout << "!!" << endl;
 
@@ -641,13 +790,15 @@ bool LL::DeclareVarList() {
         setLexem();
 
         if (iter->first != "id") return false;
+        auto item = iter->second;
+
         nextState(1);
-        addString("comma " + iter->second + " InitVar");
+        addString("comma " + item + " InitVar");
         setLexem();
-        if (!InitVar()) return false;
+        if (!InitVar(scope, p, item)) return false;
         nextState(0);
         addString("DeclareVarList");
-        if (!DeclareVarList()) return false;
+        if (!DeclareVarList(scope, p)) return false;
         backStateIt();
         return true;
     }
@@ -655,13 +806,18 @@ bool LL::DeclareVarList() {
     return true;
 }
 
-bool LL::InitVar() {
+bool LL::InitVar(ST scope, ST p, ST q) {
     if (*iter == LEX_EOF) return false;
 
     if (iter->first == "opassign"){
         setLexem();
 
         if (iter->first != "num" and iter->first != "char") return false;
+        string var = addVar(q, scope, p, iter->second);
+        if (var == "'$Error'") return false;
+
+        addAtom({scope, "MOV", iter->second, "", var});
+
         nextState(0);
         addString("opassign " + iter->second);
         setLexem();
@@ -669,88 +825,120 @@ bool LL::InitVar() {
         backStateIt();
         return true;
     }
+    string var = addVar(q, scope, p);
+    if (var == "'$Error'") return false;
+
     backStateIt();
     return true;
 }
 
-bool LL::ParamList() {
-    if (*iter == LEX_EOF) return false;
+PBS LL::ParamList(ST scope) {
+    if (*iter == LEX_EOF) return {false, ""};
 
     if (iter->first == "kwint" or iter->first == "kwchar"){
         nextState(1);
         addString("Type");
-        if (iter->first != "id") return false;
+        auto type = Type(scope);
+        if (iter->first != "id") return {false, ""};
+        string var = addVar(iter->second, scope, type.second);
+        if (var == "'$Error'") return {false, ""};
+
         nextState(0);
         addString(" " + iter->second + " ParamList'");
         setLexem();
-        if (!ParamListList()) return false;
+
+        auto result = ParamListList(scope);
+        if (!result.first) return {false, ""};
         backStateIt();
-        return true;
+        return {true, to_string(stoi(result.second) + 1)};
     }
     backStateIt();
-    return true;
+    return {true, "0"};
 }
 
-bool LL::ParamListList() {
-    if (*iter == LEX_EOF) return false;
+PBS LL::ParamListList(ST scope) {
+    if (*iter == LEX_EOF) return {false, ""};
 
     if (iter->first == "comma"){
         setLexem();
         if (iter->first != "kwint" and iter->first != "kwchar") {
             backStateIt();
-            return true; }
+            return {true, "0"}; }
         nextState(1);
         addString("comma Type");
-        if (iter->first != "id") return false;
+
+        auto type = Type(scope);
+        if (iter->first != "id") return {false, ""};
+        string var = addVar(iter->second, scope, type.second);
+        if (var == "'Error'") return {false, ""};
+
         nextState(0);
         addString(" " + iter->second + " ParamList'");
         setLexem();
-        if (!ParamListList()) return false;
+
+        auto result = ParamListList(scope);
+        if (!result.first) return {false, ""};
         backStateIt();
-        return true;
+        return {true, to_string(stoi(result.second) + 1)};
     }
     backStateIt();
-    return true;
+    return {true, "0"};
 }
 //
 // ArgList
-bool LL::Arglist() {
+PBS LL::Arglist(ST scope) {
     //if (iter == list.end()) cout << "!!!!!!!!!!!!!!!!" << endl;
     if (iter->first != "num" and iter->first != "char" and iter->first != "id" and iter->first != "opinc" and iter->first != "lpar"){
         backStateIt();
-        return true;
+        return {true, "0"};
     }
     nextState(1);
     addString(iter->first + " E");
-    if (!E()) return false;
+
+    auto result1 = E(scope);
+    if (!result1.first) return {false, ""};
     nextState(0);
     addString("ArgList'");
-    if(!ArgListList()) return false;
+
+    auto result = ArgListList(scope);
+    if(!result.first) return {false, ""};
     backStateIt();
-    return true;
+
+    addAtom({scope, "PARAM", "", "", result1.second});
+    return {true, to_string(stoi(result.second) + 1)};
 }
 
-bool LL::ArgListList() {
+PBS LL::ArgListList(ST scope) {
     if (iter->first == "comma"){
         setLexem();
-        if (iter->first != "num" and iter->first != "char" and iter->first != "id" and iter->first != "opinc" and iter->first != "lpar") return false;
+        if (iter->first != "num" and iter->first != "char" and iter->first != "id" and iter->first != "opinc" and iter->first != "lpar")
+            return {false, ""};
         nextState(1);
         addString("comma E");
 
-        if (!E()) { return false;}
+        auto result1 = E(scope);
+        if (!result1.first) { return {false, ""};}
+
         nextState(0);
         addString("Arglist'");
-        if (!ArgListList()) return false;
+
+        auto result = ArgListList(scope);
+        if (!result.first) return {false, ""};
+
+        backStateIt();
+
+        addAtom({scope, "PARAM", "", "", result1.second});
+        return {true, to_string(stoi(result.second) + 1)};
     }
     backStateIt();
-    return true;
+    return {true, "0"};
 }
 //
 // Assign Or Call operation block
-bool LL::AssignOrCallOp() {
+bool LL::AssignOrCallOp(ST scope) {
     nextState(1);
     addString("AssignOrCall");
-    if (!AssignOrCall()) return false;
+    if (!AssignOrCall(scope)) return false;
     if (iter->first != "semicolon") return false;
     nextState(0);
     addString("semicolon");
@@ -760,111 +948,174 @@ bool LL::AssignOrCallOp() {
     return true;
 }
 
-bool LL::AssignOrCall() {
+bool LL::AssignOrCall(ST scope) {
     if (iter->first != "id") return false;
+    auto item = iter->second;
+
     nextState(0);
-    addString(iter->second + " AssignOrCall'");
+    addString(item + " AssignOrCall'");
     setLexem();
-    if (!AssignOrCallList()) return false;
+    if (!AssignOrCallList(scope, item)) return false;
     backStateIt();
     return true;
 }
 
-bool LL::AssignOrCallList() {
+bool LL::AssignOrCallList(ST scope, ST p) {
     if (iter->first == "opassign"){
         setLexem();
         nextState(0);
         addString("opassign E");
-        if (!E()) return false;
+
+        auto result = E(scope);
+        if (!result.first) return false;
         backStateIt();
+
+        auto r = checkVar(scope, p);
+        addAtom({scope, "MOV", result.second, "", r});
+
         return true;
     }
     else if (iter->first == "lpar"){
         setLexem();
         nextState(1);
         addString("lpar Arglist");
-        if (!Arglist()) return false;
+
+        auto result = Arglist(scope);
+        if (!result.first) return false;
         if (iter->first != "rpar") return false;
         nextState(0);
         addString("rpar");
         setLexem();
         backStateIt();
         backStateIt();
+
+        auto q = checkFunc(p, result.second);
+        auto r = alloc(scope);
+        addAtom({scope, "CALL", q, "", r});
+
         return true;
     }
     return false;
 }//
 //while block
-bool LL::WhileOp() {
+bool LL::WhileOp(ST scope) {
     setLexem();
+
+    auto label1 = newLabel();
+    auto label2 = newLabel();
+    addAtom({scope, "LBL", "", "", "L" + label1});
+
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
     addString("lpar E");
-    if (!E()) return false;
+
+    auto result = E(scope);
+    if (!result.first) return false;
+
+    addAtom({scope, "EQ", result.second, "0", "L" + label2});
+
     if (iter->first != "rpar") return false;
     setLexem();
     nextState(0);
     addString("rpar Stmt");
-    if (!Stmt()) return false;
+    if (!Stmt(scope)) return false;
     backStateIt();
+
+    addAtom({scope, "JMP", "", "", "L" + label1});
+    addAtom({scope, "LBL", "", "", "L" + label2});
+
     return true;
 }
 //
 // block "ForOp"
-bool LL::ForOp() {
+bool LL::ForOp(ST scope) {
     setLexem();
+
+    auto label1 = newLabel();
+    auto label2 = newLabel();
+    auto label3 = newLabel();
+    auto label4 = newLabel();
+
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
     addString("lpar ForInit");
-    if (!ForInit()) return false;
+    if (!ForInit(scope)) return false;
     if (iter->first != "semicolon") return false;
     setLexem();
     backStateIt();
     nextState(1);
     addString("semicolon ForExp");
-    if (!ForExp()) return false;
-    if (iter->first != "semicolon") return false;
-    setLexem();
-    backStateIt();
+
+    addAtom({scope, "LBL", "", "", "L" + label1});
+
+    auto result = ForExp(scope);
+    if (!result.first) return false;
+
+    addAtom({scope, "EQ", result.second, "0", "L" + label4});
+    addAtom({scope, "JMP", "", "", "L" + label3});
+    addAtom({scope, "LBL", "", "", "L" + label2});
+
     nextState(1);
     addString("semicolon ForLoop");
-    if (!ForLoop()) return false;
+    if (!ForLoop(scope)) return false;
+
+    addAtom({scope, "JMP", "", "", "L" + label1});
+    addAtom({scope, "LBL", "", "", "L" + label3});
 
     nextState(0);
     addString("rpar Stmt");
-    if (!Stmt()) {return false; }
+    if (!Stmt(scope)) {return false; }
+
+    addAtom({scope, "JMP", "", "", "L" + label2});
+    addAtom({scope, "LBL", "", "", "L" + label4});
+
     backStateIt();
     return true;
 }
 
-bool LL::ForInit() {
+bool LL::ForInit(ST scope) {
     if (iter->second == "id"){
         nextState(0);
         addString("AssignOrCall");
-        if (!AssignOrCall()) return false;
+        if (!AssignOrCall(scope)) return false;
     }
     return true;
 }
 
-bool LL::ForExp() {
+PBS LL::ForExp(ST scope) {
+    bool fl = false;
+    PBS result;
     if (iter->first == "lpar" or iter->first == "id" or iter->first == "num" or iter->first == "char" or iter->first == "opinc"){
         nextState(0);
         addString("E");
 
-        if (!E()) { return false;}
+        result = E(scope);
+        fl = !result.first? true: false;
     }
-    return true;
+    if (iter->first == "semicolon") {
+        setLexem();
+        backStateIt();
+
+        if (fl) return {true, "1"};
+        return {true, result.second};
+    }
+
+    return {false, ""};
 }
 
-bool LL::ForLoop() {
+bool LL::ForLoop(ST scope) {
     if (iter->first == "opinc"){
         setLexem();
 
         if (iter->first != "id") return false;
         auto item = iter->second;
         setLexem();
+
+        auto p = checkVar(scope, item);
+        addAtom({scope, "ADD", p, "1", p});
+
         if (iter->first != "rpar") return false;
         nextState(0);
         addString("opinc " + item);
@@ -876,7 +1127,7 @@ bool LL::ForLoop() {
     if (iter->first == "id"){
         nextState(1);
         addString("AssignOrCall");
-        if (!AssignOrCall()) return false;
+        if (!AssignOrCall(scope)) return false;
         if (iter->first != "rpar") return false;
         setLexem();
         backStateIt();
@@ -889,47 +1140,65 @@ bool LL::ForLoop() {
 }
 //
 // block "IfOp"
-bool LL::IfOp() {
+bool LL::IfOp(ST scope) {
     setLexem();
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
     addString("lpar E");
-    if (!E()) return false;
+
+    auto result = E(scope);
+    if (!result.first) return false;
     if (iter->first != "rpar") return false;
     setLexem();
+
+    auto label1 = newLabel();
+    addAtom({scope, "EQ", result.second, "0", "L" + label1});
+
     nextState(1);
     addString("rpar Stmt");
-    if (!Stmt()) return false;
+    if (!Stmt(scope)) return false;
+
+    auto label2 = newLabel();
+    addAtom({scope, "JMP", "", "", "L" + label2});
+    addAtom({scope, "LBL", "", "", "L" + label1});
+
     nextState(0);
     addString("ElsePart");
     if (iter->first == "kwelse"){
-        if (!ElsePart()) return false;
+        if (!ElsePart(scope)) return false;
+
+        addAtom({scope, "LBL", "", "", "L" + label2});
+
         backStateIt();
         return true;
     }
+    addAtom({scope, "LBL", "", "", "L" + label2});
+
     backStateIt();
     backStateIt();
     return true;
 }
 
-bool LL::ElsePart() {
+bool LL::ElsePart(ST scope) {
     nextState(0);
     addString("kwelse Stmt");
     setLexem();
-    if(!Stmt()) return false;
+    if(!Stmt(scope)) return false;
     backStateIt();
     return true;
 }
 //
 // block "SwitchOp"
-bool LL::SwitchOp() {
+bool LL::SwitchOp(ST scope) {
     setLexem();
     if (iter->first != "lpar") return false;
     setLexem();
     nextState(1);
     addString("lpar E");
-    if (!E()) return false;
+
+    auto result = E(scope);
+    if (!result.first) return false;
     if (iter->first != "rpar") return false;
     setLexem();
 
@@ -938,7 +1207,8 @@ bool LL::SwitchOp() {
     nextState(1);
     addString("lpar lbrace Cases");
 
-    if (!Cases()) return false;
+    auto end = newLabel();
+    if (!Cases(scope, result.second, end)) return false;
     //cout << 1 << endl;
     if (iter->first != "rbrace") return false;
     setLexem();
@@ -946,66 +1216,102 @@ bool LL::SwitchOp() {
     addString("rbrace");
     backStateIt();
     backStateIt();
+
+    addAtom({scope, "LBL", "", "", "L" + end});
     return true;
 }
 
-bool LL::Cases() {
+bool LL::Cases(ST scope, ST p, ST end) {
     nextState( 1);
     addString("Acase");
-    if (!ACase()) return false;
+
+    auto result = ACase(scope, p, end);
+    if (!result.first) return false;
     //cout << 2 << endl;
     nextState(0);
     addString("CasesList");
-    if (!CasesList()) return false;
+    if (!CasesList(scope, p, end, result.second)) return false;
     backStateIt();
     return true;
 }
 
-bool LL::CasesList() {
+bool LL::CasesList(ST scope, ST p, ST end, ST def) {
     if (iter->first == "kwdefault" or iter->first == "kwcase") {
         nextState(1);
         addString("Acase");
-        if (ACase()) return false;
+
+        auto result = ACase(scope, p, end);
+        if (!result.first) return false;
+
+        if (stoi(def) >= 0 and stoi(result.second) >= 0){
+            addAtom({"$Error", "$Error", "$Error", "$Error", "$Error"});
+        }
+        auto def2 = stoi(def) < stoi(result.second) ? result.second: def;
+
         nextState(0);
         addString("CasesList");
-        if (!CasesList()) return false;
+
+        if (!CasesList(scope, p, end, def2)) return false;
 
     }
+    cout << def << " " << end << endl;
+    string q = stoi(def) >= 0 ? def: end;
+    addAtom({scope, "JMP", "", "", "L" + q});
+
     backStateIt();
     return true;
 }
 
-bool LL::ACase() {
+PBS LL::ACase(ST scope, ST p, ST end) {
     if (iter->first == "kwcase"){
         setLexem();
-        if (iter->first != "num" and iter->first != "char")return false;
+        if (iter->first != "num" and iter->first != "char")return {false, ""};
         auto item = iter->second;
         setLexem();
-        if (iter->first != "colon") return false;
+
+        string next = newLabel();
+        addAtom({scope, "NE", p, item, "L" + next});
+
+        if (iter->first != "colon") return {false, ""};
         nextState(0);
         addString("kwcase " + item + " colon StmtList");
         setLexem();
-        if (!StmtList()) return false;
+        if (!StmtList(scope)) return {false, ""};
+
+        addAtom({scope, "JMP", "", "", "L" + end});
+        addAtom({scope, "LBL", "", "", "L" + next});
+
         backStateIt();
-        return true;
+        return {true, "-1"};
 
     }
     else if (iter->first == "kwdefault"){
         setLexem();
 
-        if (iter->first != "colon") return false;
+        if (iter->first != "colon") return {false, ""};
         setLexem();
         nextState(0);
         addString("kwdefault colon StmtList");
-        if (!StmtList()) return false;
+
+        string next = newLabel();
+        string def = newLabel();
+
+        addAtom({scope, "JMP", "", "", "L" + next});
+        addAtom({scope, "LBL", "", "", "L" + def});
+
+        if (!StmtList(scope)) return {false, ""};
         backStateIt();
-        return true;
+
+        addAtom({scope, "JMP", "", "", "L" + end});
+        addAtom({scope, "LBL", "", "", "L" + next});
+
+        return {true, def};
     }
-    return false;
+    return {false, ""};
 }
 //
 // block "IN" and "OUT"
-bool LL::IOp() {
+bool LL::IOp(ST scope) {
     setLexem();
     if (iter->first != "id") return false;
     auto item = iter->second;
@@ -1017,15 +1323,19 @@ bool LL::IOp() {
     addString(item + "semicolon");
     backStateIt();
     backStateIt();
+
+    auto p = checkVar(scope, item);
+    addAtom({scope, "IN", "", "", p});
+
     return true;
 }
 
-bool LL::OOp() {
+bool LL::OOp(ST scope) {
     setLexem();
 
     nextState(1);
     addString("kwout OOp'");
-    if (!OOpList()) return false;
+    if (!OOpList(scope)) return false;
     if (iter->first != "semicolon") return false;
     setLexem();
     nextState(0);
@@ -1035,18 +1345,24 @@ bool LL::OOp() {
     return true;
 }
 
-bool LL::OOpList() {
+bool LL::OOpList(ST scope) {
     if (iter->first == "str"){
+        auto item = iter->second;
         nextState(0);
-        addString("\"" + iter->second + "\"");
+        addString("\"" + item + "\"");
         setLexem();
         backStateIt();
         backStateIt();
+
+        addAtom({scope, "OUT", "", "", "\"" + item + "\""});
         return true;
     }
     nextState(0);
     addString("E");
-    if (!E()) return false;
+    auto result = E(scope);
+    if (!result.first) return false;
     backStateIt();
+
+    addAtom({scope, "OUT", "", "", result.second});
     return true;
 }

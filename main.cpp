@@ -24,7 +24,7 @@ int main(){
 //    }
     fstream file(R"(D:\\files\\solution_for_clion\\Lexer_miniC\\lex-lib\\input_3.txt)");
     Lexer lexer = Lexer(file);
-    LL ll = LL(lexer,  R"(D:\\files\\solution_for_clion\\Lexer_miniC\\output.txt)");
+    LL ll = LL(lexer,  R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputTree.txt)", R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputAtoms.txt)");
     ll.solve();
     return 0;
 }
