@@ -4,6 +4,7 @@
 
 #include <TopDownSA.h>
 
+
 LL::LL(Lexer &lexer, const std::string & outPathstr, ST outputAtoms): lexer(lexer){
     outPath = outPathstr;
     outPathAtom = outputAtoms;
@@ -30,12 +31,17 @@ void LL::solve() {
     ofstream outAtoms;
     outAtoms.open(outPathAtom);
     for (auto  now : atomList){
-        outAtoms << "(" << now.operation << ", " << now.first << ", " << now.second << ", " <<
+        if (now.scope == "$Error" or now.operation == "$Error" or now.second == "$Error" or now.first == "$Error" or now.third == "$Error"){
+            outAtoms.clear();
+            cout << "Semantic error" << endl;
+            return;
+        }
+        outAtoms << now.scope + ": " <<"(" << now.operation << ", " << now.first << ", " << now.second << ", " <<
         now.third << ")" << endl;
     }
 
     outAtoms << endl << endl << "=========================================" << endl;
-    outAtoms << "Code  :  Name  :  Kind  :  Type  :  Init  :  Len  :Scope" << endl;
+    outAtoms << "Code  :  Name  :  Kind  :  Type  :  Init  :  Len  :  Scope" << endl;
 
     for (auto now: table){
         outAtoms << now.code + " " + now.name + " " + now.kind + " " + now.type + " " + now.value + " " + now.len + " " + now.scope << endl;
@@ -718,7 +724,7 @@ bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
         backStateIt();
         backStateIt();
 
-        addAtom({scope, "RET", "", "", "0"});
+        addAtom({codeFunc, "RET", "", "", "0"});
         return true;
     }
     else if (iter->first == "opassign"){
@@ -893,7 +899,7 @@ PBS LL::Arglist(ST scope) {
         return {true, "0"};
     }
     nextState(1);
-    addString(iter->first + " E");
+    addString(iter->second + " E");
 
     auto result1 = E(scope);
     if (!result1.first) return {false, ""};
@@ -1334,7 +1340,7 @@ bool LL::OOp(ST scope) {
     setLexem();
 
     nextState(1);
-    addString("kwout OOp'");
+    addString("OOp'");
     if (!OOpList(scope)) return false;
     if (iter->first != "semicolon") return false;
     setLexem();
