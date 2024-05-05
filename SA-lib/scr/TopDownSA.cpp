@@ -41,10 +41,10 @@ void LL::solve() {
     }
 
     outAtoms << endl << endl << "=========================================" << endl;
-    outAtoms << "Code  :  Name  :  Kind  :  Type  :  Init  :  Len  :  Scope" << endl;
+    outAtoms << "Code  :  Name  :  Kind  :  Type  :  Init  :  Len  :  Scope  :  Offset" << endl;
 
     for (auto now: table){
-        outAtoms << now.code + " " + now.name + " " + now.kind + " " + now.type + " " + now.value + " " + now.len + " " + now.scope << endl;
+        outAtoms << now.code + " " + now.name + " " + now.kind + " " + now.type + " " + now.value + " " + now.len + " " + now.scope + " " + now.offset << endl;
     }
 
     return;
@@ -723,6 +723,23 @@ bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
         addString("rbrace");
         backStateIt();
         backStateIt();
+//
+//offset block control
+        int counter = 0;
+        for (int i = table.size() - 1; i > stoi(codeFunc) - 1 + stoi(result.second); i--){
+            if (table[i].scope == codeFunc){
+                table[i].offset = to_string(counter);
+                counter += 2;
+            }
+        }
+
+        counter += 2;
+
+        for (int i = stoi(codeFunc) + stoi(result.second) - 1; i > stoi(codeFunc) - 1; i-- ){
+            table[i].offset = to_string(counter);
+            counter += 2;
+        }
+//
 
         addAtom({codeFunc, "RET", "", "", "0"});
         return true;

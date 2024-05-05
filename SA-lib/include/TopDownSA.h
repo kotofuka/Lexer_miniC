@@ -151,6 +151,7 @@ private:
         string len = "-1";
         string value = "0";
         string scope = "-1";
+        string offset = "-1";
     };
 
     vector<object> table;
