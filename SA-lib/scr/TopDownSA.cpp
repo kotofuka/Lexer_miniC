@@ -5,9 +5,10 @@
 #include <TopDownSA.h>
 
 
-LL::LL(Lexer &lexer, const std::string & outPathstr, ST outputAtoms): lexer(lexer){
+LL::LL(Lexer &lexer, const std::string & outPathstr, ST outputAtoms, ST outputAsm): lexer(lexer){
     outPath = outPathstr;
     outPathAtom = outputAtoms;
+    outPathAsm = outputAsm;
 }
 
 void LL::solve() {
@@ -17,27 +18,61 @@ void LL::solve() {
     addString("StmtList");
 
     bool f = StmtList("-1") and *iter == LEX_EOF;
+
+    cout << "Execution results:" << endl;
+
+    if (!printTree(f)) {
+        cout << "Result: fail" << endl;
+        return; }
+
+    else if (!printAtoms()) {
+        cout << "Result: fail" << endl;
+        return; }
+
+    else if (!asmBlock()) {
+        cout << "Result: fail" << endl;
+        return; }
+    cout << "Result: all blocks are completed successfully" << endl;
+    return;
+}
+//
+// Other func
+//print SA-Tree
+bool LL::printTree(bool fl) {
+    cout << "-Syntax block: ";
     outStr.open(outPath);
-    if (f) {
+    outStr.clear();
+    if (fl) {
         for (const auto &now: output) {
             outStr << now << endl;
             //cout << now << endl;
         }
         outStr << endl << "Result: Accept" << endl;
+        cout << "The tree was painting" << endl;
     }
-    else outStr << endl << "Result: Error" << endl;
-
+    else {
+        outStr << endl << "Result: Error" << endl;
+        cout << "Syntax error" << endl;
+        outStr.close();
+        return false;
+    }
     outStr.close();
+    return true;
+}
+//
+// print Atoms and semantic verification
+bool LL::printAtoms() {
     ofstream outAtoms;
+    cout << "-Semantic block: ";
     outAtoms.open(outPathAtom);
     for (auto  now : atomList){
         if (now.scope == "$Error" or now.operation == "$Error" or now.second == "$Error" or now.first == "$Error" or now.third == "$Error"){
             outAtoms.clear();
             cout << "Semantic error" << endl;
-            return;
+            return false;
         }
         outAtoms << now.scope + ": " <<"(" << now.operation << ", " << now.first << ", " << now.second << ", " <<
-        now.third << ")" << endl;
+                 now.third << ")" << endl;
     }
 
     outAtoms << endl << endl << "=========================================" << endl;
@@ -46,22 +81,69 @@ void LL::solve() {
     for (auto now: table){
         outAtoms << now.code + " " + now.name + " " + now.kind + " " + now.type + " " + now.value + " " + now.len + " " + now.scope + " " + now.offset << endl;
     }
+    cout << "Atoms was printed" << endl;
+    return true;
+}
+//
+// assembler block
+bool LL::asmBlock() {
+    //checking for the presence of a "main" (entry point)
+    bool fl = false;
+    for (auto now: table){
+        if (now.name == "main") {
+            fl = true;
+            break;
+        }
+    }
+    if (!fl) {
+        cout << "-Assembler block: the function \'main\' is missing (Error)" << endl;
+        return false;
+    }
 
+    cout << "-Assembler block: ";
+    //
+    // adding global vars and other initial preparations
+    asmList.push_back("ORG 8000H");
+    for (auto now: table){
+        if (now.scope == "-1" and now.kind == "var"){
+            asmList.push_back(now.name + " DB " + now.value);
+        }
+    }
+    asmList.push_back("ORG 0\nLXI H,0\nSPHL\nPUSH B\n");
+    //
+    //main block
+
+    // call(main)
+
+    //
+    //printing assembly code
+    printAsm();
+    cout << "Assembler code has been generated successfully" << endl;
+    return true;
+}
+
+void LL::printAsm() {
+    fstream out;
+    out.open(outPathAsm);
+    out.clear();
+    for (auto now: asmList){
+        out << now << endl;
+    }
+    out.close();
     return;
 }
 //
-// Other func
 
 void LL::setLexem() {
     if (list.empty() or iter == list.end() - 1){
         list.emplace_back(lexer.getNextLexem());
         iter = list.end() - 1;
-        cout << iter->first << " " << iter->second << endl;
+        //cout << iter->first << " " << iter->second << endl;
 
         return;
     }
     iter++;
-    cout << iter->first << " " << iter->second << endl;
+    //cout << iter->first << " " << iter->second << endl;
     return;
 }
 

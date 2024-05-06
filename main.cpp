@@ -23,8 +23,11 @@ int main(){
 //        }
 //    }
     fstream file(R"(D:\\files\\solution_for_clion\\Lexer_miniC\\lex-lib\\input_3.txt)");
+    string treefile = R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputTree.txt)";
+    string atomfile = R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputAtoms.txt)";
+    string asmfile = R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputAsm.txt)";
     Lexer lexer = Lexer(file);
-    LL ll = LL(lexer,  R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputTree.txt)", R"(D:\\files\\solution_for_clion\\Lexer_miniC\\outputAtoms.txt)");
+    LL ll = LL(lexer,  treefile, atomfile, asmfile);
     ll.solve();
     return 0;
 }

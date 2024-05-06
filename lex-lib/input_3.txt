@@ -4,6 +4,9 @@ int f(int n){
     return n * f(n - 1);
 }
 
+int a;
+int b = 132;
+
 int main (){
     int a = 5;
     out f(a);

@@ -134,6 +134,8 @@ private:
     string outPath;
 
     vector<string> output;
+
+    bool printTree(bool fl);
     //
     //semantic block
     string newLabel();
@@ -149,7 +151,7 @@ private:
         string kind;
         string type = "kwint";
         string len = "-1";
-        string value = "0";
+        string value = "00";
         string scope = "-1";
         string offset = "-1";
     };
@@ -158,6 +160,8 @@ private:
     int labelCounter = 0;
     int codeCounter = 0;
     int tempVarCounter = 0;
+
+    bool printAtoms();
     //
     //atom block
     struct atom{
@@ -172,9 +176,18 @@ private:
     vector<atom> atomList;
     string outPathAtom;
     //
+    //assembler block (for web asm)
+    vector<string> asmList;
+    string outPathAsm;
+
+    bool asmBlock();
+    void printAsm();
+
+    void loadOp(ST A, ST op);
+    void saveOp(ST A, ST op);
 
 public:
     void solve ();
 
-    explicit LL(Lexer& lexer, const string&, ST);
+    explicit LL(Lexer& lexer, const string&, ST, ST);
 };
