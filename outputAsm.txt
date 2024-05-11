@@ -1,8 +1,9 @@
 ORG 8000H
 a DB 0
-b DB 132
 ORG 0
 LXI H,0
 SPHL
 PUSH B
+
+
 

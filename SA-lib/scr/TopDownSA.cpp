@@ -123,7 +123,6 @@ bool LL::asmBlock() {
 }
 
 void LL::printAsm() {
-    fstream out;
     out.open(outPathAsm);
     out.clear();
     for (auto now: asmList){
@@ -132,6 +131,39 @@ void LL::printAsm() {
     out.close();
     return;
 }
+
+void LL::loadOp(ST operand) {
+    if (operand[0] != '\''){
+        out << "MVI A, " << operand << endl;
+    }
+    else if (operand[0] == '\"'){
+        out << "MVI A, " << operand.substr(1,operand.size() - 2) << endl;
+        return;
+    }
+    object item = table[stoi(operand) - 1];
+    if (item.scope == "-1"){
+        out << "LDA " << item.name << endl;
+    }
+    else{
+        out << "LXI H, " << item.offset << endl;
+        out << "DAD SP" << endl;
+        out << "MOV A, M" << endl;
+    }
+}
+
+void LL::saveOp(ST operand) {
+    object item = table[stoi(operand) - 1];
+    if (item.scope == "-1"){
+        out << "STA " << item.name;
+    }
+    else {
+        out << "LXI H, " << item.offset << endl;
+        out << "DAD SP" << endl;
+        out << "MOV M, A" << endl;
+    }
+}
+
+
 //
 
 void LL::setLexem() {
@@ -189,10 +221,15 @@ string LL::alloc(const string &scope) {
 
 string LL::addVar(const std::string &name, const string &scope, const std::string type, const std::string &init) {
     bool fl = false;
-    for (auto now: table) {
-        if (now.name == name and now.scope == scope){
-            fl = true;
-            break;
+    for (int i = 0; i < table.size(); i++) {
+        if (table[i].name == name and table[i].scope == scope){
+
+            if (table[i].kind != "var" or table[i].type != type){
+                fl = true;
+                break;
+            }
+            table[i].value = init;
+            return table[i].code;
         }
     }
     if (fl) return "$Error";

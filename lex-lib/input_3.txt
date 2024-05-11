@@ -4,12 +4,13 @@ int f(int n){
     return n * f(n - 1);
 }
 
+int a = 132;
 int a;
-int b = 132;
 
 int main (){
     int a = 5;
     out f(a);
     if (a > 0) if (a == 0) out 1;
     else out 2;
+    out "aaa";
 }

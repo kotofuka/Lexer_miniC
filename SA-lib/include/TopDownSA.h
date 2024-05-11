@@ -183,8 +183,50 @@ private:
     bool asmBlock();
     void printAsm();
 
-    void loadOp(ST A, ST op);
-    void saveOp(ST A, ST op);
+    void loadOp(ST operand);
+    void saveOp(ST operand);
+
+    //assembly commands
+    void ADD(const atom& atom);
+
+    void SUB(const atom& atom);
+
+    void MUL(const atom& atom);
+
+    void MOV(const atom& atom);
+
+    void LBL(const atom& atom);
+
+    void JMP(const atom& atom);
+
+    void AND(const atom& atom);
+
+    void OR(const atom& atom);
+
+    void EQ(const atom& atom);
+
+    void NE(const atom& atom);
+
+    void LT(const atom& atom);
+
+    void LE(const atom& atom);
+
+    void GT(const atom& atom);
+
+    void NOT(const atom& atom);
+
+    void IN(const atom& atom);
+
+    void OUT(const atom& atom);
+
+    void PARAM(const atom& atom);
+
+    void CALL(const atom& atom);
+
+    void RET(const atom& atom);
+    //
+
+    fstream out;
 
 public:
     void solve ();
