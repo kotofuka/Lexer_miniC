@@ -109,7 +109,18 @@ bool LL::asmBlock() {
             asmList.push_back(now.name + " DB " + now.value);
         }
     }
-    asmList.push_back("ORG 0\nLXI H,0\nSPHL\nPUSH B\nCALL main\nEND\n@MUL\n@DIV\n@PRINT\n\n");
+    asmList.push_back("ORG 0\nLXI H,0\nSPHL");
+
+    for (auto now: table){
+        if (now.name == "main" and now.scope == "-1"){
+            for (int i = 0; i < stoi(table[stoi(now.code.substr(1, now.code.size()- 2))].offset); i++){
+                asmList.push_back("PUSH B");
+            }
+
+            break;
+        }
+    }
+    asmList.push_back("CALL main\nEND\n@MUL\n@DIV\n@PRINT\n\n");
     //
     //main block
     for (auto now: atomList){
@@ -213,8 +224,8 @@ void LL::MUL(const LL::atom &atom) {
     asmList.push_back("PUSH B ; the place for the return value");
     asmList.push_back("; PUSH B ; n times (add local vars) and other actions before the call");
     asmList.push_back("CALL @MULT");
-    asmList.push_back("; POP ; n times (delete local vars)");
-    asmList.push_back("POP; remove the result");
+    asmList.push_back("; POP B; n times (delete local vars)");
+    asmList.push_back("POP B; remove the result");
     asmList.push_back("MOV A, C");
     saveOp(atom.third);
 }
@@ -308,7 +319,7 @@ void LL::NOT(const LL::atom &atom) {
 void LL::IN(const LL::atom &atom) {
     asmList.push_back("\n\t; IN block");
     asmList.push_back("IN 0");
-    loadOp(atom.third);
+    saveOp(atom.third);
 }
 
 void LL::OUT(const LL::atom &atom) {
@@ -318,11 +329,39 @@ void LL::OUT(const LL::atom &atom) {
 }
 
 void LL::PARAM(const LL::atom &atom) {
-
+    programStack.push(atom.third);
 }
 
 void LL::CALL(const LL::atom &atom) {
+    asmList.push_back("\n\t; CALL block");
+    asmList.push_back("PUSH B");
 
+    object func = table[stoi(atom.first.substr(1, atom.first.size() - 2)) - 1];
+    int n = stoi(func.offset);
+    int l = stoi(func.len);
+
+    for (int i = 0; i < l; i++){
+        asmList.push_back("PUSH B");
+    }
+
+    for (int i = 0; i < l; i++){
+        //cout << i << endl;
+        string item = programStack.top();
+        loadOp(item);
+        programStack.pop();
+
+        asmList.push_back("LXI H, " + to_string(i * 2));
+        asmList.push_back("DAD SP");
+        asmList.push_back("MOV M, A");
+    }
+    asmList.push_back("CALL " + func.name);
+
+    for (int i = 0; i < l; i++){
+        asmList.push_back("POP B");
+    }
+    asmList.push_back("POP B");
+    asmList.push_back("MOV A, C");
+    saveOp(atom.third);
 }
 
 void LL::RET(const LL::atom &atom) {

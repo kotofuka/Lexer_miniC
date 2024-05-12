@@ -4,6 +4,9 @@ ORG 0
 LXI H,0
 SPHL
 PUSH B
+PUSH B
+PUSH B
+PUSH B
 CALL main
 END
 @MUL
@@ -44,8 +47,8 @@ MOV C, A
 PUSH B ; the place for the return value
 ; PUSH B ; n times (add local vars) and other actions before the call
 CALL @MULT
-; POP ; n times (delete local vars)
-POP; remove the result
+; POP B; n times (delete local vars)
+POP B; remove the result
 MOV A, C
 LXI H, 2
 DAD SP
@@ -134,13 +137,36 @@ main:
 
 	; IN block
 IN 0
-LDA a
+STA a
 
 	; IN block
 IN 0
 LXI H, 4
 DAD SP
+MOV M, A
+
+	; CALL block
+PUSH B
+PUSH B
+PUSH B
+LDA a
+LXI H, 0
+DAD SP
+MOV M, A
+LXI H, 4
+DAD SP
 MOV A, M
+LXI H, 2
+DAD SP
+MOV M, A
+CALL func
+POP B
+POP B
+POP B
+MOV A, C
+LXI H, 0
+DAD SP
+MOV M, A
 
 	; MOV block
 LXI H, 0
@@ -170,6 +196,18 @@ RET
 MVI A, 0
 LXI H, 6
 DAD SP
+MOV M, A
+POP
+POP
+POP
+RET
+
+ M, A
+POP
+POP
+POP
+RET
+
 MOV M, A
 POP
 POP

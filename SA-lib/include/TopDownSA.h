@@ -179,6 +179,7 @@ private:
     //assembler block (for web asm)
     vector<string> asmList;
     string outPathAsm;
+    stack<string> programStack;
 
     bool asmBlock();
     void printAsm();
