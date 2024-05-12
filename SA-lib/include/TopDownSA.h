@@ -184,7 +184,7 @@ private:
     bool asmBlock();
     void printAsm();
 
-    void loadOp(ST operand);
+    void loadOp(ST operand, ST scope, int newOffset);
     void saveOp(ST operand);
 
     //assembly commands

@@ -161,7 +161,7 @@ void LL::printAsm() {
     return;
 }
 
-void LL::loadOp(ST operand) {
+void LL::loadOp(ST operand, ST scope, int newOffset = -1) {
     if (operand[0] != '\''){
         asmList.push_back("MVI A, " + operand);
         return;
@@ -172,11 +172,17 @@ void LL::loadOp(ST operand) {
     }
     //cout << "loadOp: " << stoi(operand) << endl;
     object item = table[stoi(operand.substr(1, operand.size() - 2)) - 1];
-    if (item.scope == "-1"){
+    if (scope == "-1"){
         asmList.push_back("LDA " + item.name);
     }
     else{
-        asmList.push_back("LXI H, " + item.offset);
+        if (newOffset != -1){
+            asmList.push_back("LXI H, " + to_string(newOffset));
+
+        }
+        else{
+            asmList.push_back("LXI H, " + item.offset);
+        }
         asmList.push_back("DAD SP");
         asmList.push_back("MOV A, M");
     }
@@ -198,27 +204,27 @@ void LL::saveOp(ST operand) {
 //assembly operations (functions)
 void LL::ADD(const LL::atom &atom) {
     asmList.push_back("\n\t; ADD block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("ADD B");
     saveOp(atom.third);
 }
 
 void LL::SUB(const LL::atom &atom) {
     asmList.push_back("\n\t; SUB block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("SUB B");
     saveOp(atom.third);
 }
 
 void LL::MUL(const LL::atom &atom) {
     asmList.push_back("\n\t; MUL block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV D, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("MOV C, A");
     asmList.push_back("\t; call black box with op @MULT");
     asmList.push_back("PUSH B ; the place for the return value");
@@ -232,7 +238,7 @@ void LL::MUL(const LL::atom &atom) {
 
 void LL::MOV(const LL::atom &atom) {
     asmList.push_back("\n\t; MOV block");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     saveOp(atom.third);
 
 }
@@ -247,54 +253,54 @@ void LL::JMP(const LL::atom &atom) {
 
 void LL::AND(const LL::atom &atom) {
     asmList.push_back("\n\t; AND block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("ANA B");
     saveOp(atom.third);
 }
 
 void LL::OR(const LL::atom &atom) {
     asmList.push_back("\n\t; OR block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("ORA B");
     saveOp(atom.third);
 }
 
 void LL::EQ(const LL::atom &atom) {
     asmList.push_back("\n\t; EQ block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("CMP B");
     asmList.push_back("JZ " + atom.third);
 }
 
 void LL::NE(const LL::atom &atom) {
     asmList.push_back("\n\t; NE block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("CMP B");
     asmList.push_back("JNZ " + atom.third);
 }
 
 void LL::LT(const LL::atom &atom) {
     asmList.push_back("\n\t; LT block");
-    loadOp(atom.second);
+    loadOp(atom.second,atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("CMP B");
     asmList.push_back("JM " + atom.third);
 }
 
 void LL::LE(const LL::atom &atom) {
     asmList.push_back("\n\t; LE block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("CMP B");
     asmList.push_back("JZ " + atom.third);
     asmList.push_back("JM" + atom.third);
@@ -302,16 +308,16 @@ void LL::LE(const LL::atom &atom) {
 
 void LL::GT(const LL::atom &atom) {
     asmList.push_back("\n\t; GT block");
-    loadOp(atom.second);
+    loadOp(atom.second, atom.scope);
     asmList.push_back("MOV B, A");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("CMP B");
     asmList.push_back("JP " + atom.third);
 }
 
 void LL::NOT(const LL::atom &atom) {
     asmList.push_back("\n\t; NOT block");
-    loadOp(atom.first);
+    loadOp(atom.first, atom.scope);
     asmList.push_back("CMA");
     saveOp(atom.third);
 }
@@ -324,7 +330,7 @@ void LL::IN(const LL::atom &atom) {
 
 void LL::OUT(const LL::atom &atom) {
     asmList.push_back("\n\t; OUT block");
-    loadOp(atom.third);
+    loadOp(atom.third, atom.scope);
     asmList.push_back("OUT 1");
 }
 
@@ -337,26 +343,28 @@ void LL::CALL(const LL::atom &atom) {
     asmList.push_back("PUSH B");
 
     object func = table[stoi(atom.first.substr(1, atom.first.size() - 2)) - 1];
-    int n = stoi(func.offset);
-    int l = stoi(func.len);
+    int n = stoi(func.len);
+    int total = stoi(func.offset);
+    string funcCode = func.code.substr(1, func.code.size() - 2);
 
-    for (int i = 0; i < l; i++){
+    for (int i = 0; i < n; i++){
         asmList.push_back("PUSH B");
     }
-
-    for (int i = 0; i < l; i++){
-        //cout << i << endl;
+    for (int i = n - 1; i >= 0; i--){
         string item = programStack.top();
-        loadOp(item);
+        cout << atom.scope << endl;
         programStack.pop();
+        int newOffset = stoi(table[stoi(funcCode) + i].offset) - (i + 1 != n ? stoi(table[stoi(funcCode) + i + 1].offset): 0);
+        loadOp(item, atom.scope, newOffset);
 
-        asmList.push_back("LXI H, " + to_string(i * 2));
+
+        asmList.push_back("LXI H, " + to_string((n - i - 1) * 2));
         asmList.push_back("DAD SP");
         asmList.push_back("MOV M, A");
     }
     asmList.push_back("CALL " + func.name);
 
-    for (int i = 0; i < l; i++){
+    for (int i = 0; i < n; i++){
         asmList.push_back("POP B");
     }
     asmList.push_back("POP B");
@@ -367,7 +375,7 @@ void LL::CALL(const LL::atom &atom) {
 void LL::RET(const LL::atom &atom) {
     int m = stoi(table[stoi(atom.scope) - 1].offset) - stoi(table[stoi(atom.scope) - 1].len);
     asmList.push_back("\n\t; RET block");
-    loadOp(atom.third);
+    loadOp(atom.third, atom.scope);
     asmList.push_back("LXI H, " + to_string(m*2));
     asmList.push_back("DAD SP");
     asmList.push_back("MOV M, A");
