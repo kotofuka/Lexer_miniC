@@ -109,12 +109,30 @@ bool LL::asmBlock() {
             asmList.push_back(now.name + " DB " + now.value);
         }
     }
-    asmList.push_back("ORG 0\nLXI H,0\nSPHL\nPUSH B\n");
+    asmList.push_back("ORG 0\nLXI H,0\nSPHL\nPUSH B\nCALL main\nEND\n@MUL\n@DIV\n@PRINT\n\n");
     //
     //main block
-
-    // call(main)
-
+    for (auto now: atomList){
+        if (now.operation == "ADD") ADD(now); // done
+        else if (now.operation == "SUB") SUB(now); // done
+        else if (now.operation == "MUL") MUL(now); // done
+        else if (now.operation == "MOV") MOV(now); // done
+        else if (now.operation == "LBL") LBL(now); // done
+        else if (now.operation == "JMP") JMP(now); // done
+        else if (now.operation == "AND") AND(now); // done
+        else if (now.operation == "OR") OR(now); // done
+        else if (now.operation == "EQ") EQ(now); // done
+        else if (now.operation == "NE") NE(now); // done
+        else if (now.operation == "LT") LT(now); // done
+        else if (now.operation == "LE") LE(now); // done
+        else if (now.operation == "GT") GT(now); // done
+        else if (now.operation == "NOT") NOT(now); // done
+        else if (now.operation == "IN") IN(now); // done
+        else if (now.operation == "OUT") OUT(now); // done
+        else if (now.operation == "PARAM") PARAM(now);
+        else if (now.operation == "CALL") CALL(now);
+        else if (now.operation == "RET") RET(now); // done
+    }
     //
     //printing assembly code
     printAsm();
@@ -134,36 +152,191 @@ void LL::printAsm() {
 
 void LL::loadOp(ST operand) {
     if (operand[0] != '\''){
-        out << "MVI A, " << operand << endl;
-    }
-    else if (operand[0] == '\"'){
-        out << "MVI A, " << operand.substr(1,operand.size() - 2) << endl;
+        asmList.push_back("MVI A, " + operand);
         return;
     }
-    object item = table[stoi(operand) - 1];
+    else if (operand[0] == '\"'){
+        asmList.push_back("MVI A, " + operand.substr(1,operand.size() - 2));
+        return;
+    }
+    //cout << "loadOp: " << stoi(operand) << endl;
+    object item = table[stoi(operand.substr(1, operand.size() - 2)) - 1];
     if (item.scope == "-1"){
-        out << "LDA " << item.name << endl;
+        asmList.push_back("LDA " + item.name);
     }
     else{
-        out << "LXI H, " << item.offset << endl;
-        out << "DAD SP" << endl;
-        out << "MOV A, M" << endl;
+        asmList.push_back("LXI H, " + item.offset);
+        asmList.push_back("DAD SP");
+        asmList.push_back("MOV A, M");
     }
 }
 
 void LL::saveOp(ST operand) {
-    object item = table[stoi(operand) - 1];
+    //cout << operand << endl;
+    object item = table[stoi(operand.substr(1, operand.size() - 2)) - 1];
     if (item.scope == "-1"){
-        out << "STA " << item.name;
+        asmList.push_back("STA " + item.name);
     }
     else {
-        out << "LXI H, " << item.offset << endl;
-        out << "DAD SP" << endl;
-        out << "MOV M, A" << endl;
+        asmList.push_back("LXI H, " + item.offset);
+        asmList.push_back("DAD SP");
+        asmList.push_back("MOV M, A");
     }
 }
+//
+//assembly operations (functions)
+void LL::ADD(const LL::atom &atom) {
+    asmList.push_back("\n\t; ADD block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("ADD B");
+    saveOp(atom.third);
+}
 
+void LL::SUB(const LL::atom &atom) {
+    asmList.push_back("\n\t; SUB block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("SUB B");
+    saveOp(atom.third);
+}
 
+void LL::MUL(const LL::atom &atom) {
+    asmList.push_back("\n\t; MUL block");
+    loadOp(atom.second);
+    asmList.push_back("MOV D, A");
+    loadOp(atom.first);
+    asmList.push_back("MOV C, A");
+    asmList.push_back("\t; call black box with op @MULT");
+    asmList.push_back("PUSH B ; the place for the return value");
+    asmList.push_back("; PUSH B ; n times (add local vars) and other actions before the call");
+    asmList.push_back("CALL @MULT");
+    asmList.push_back("; POP ; n times (delete local vars)");
+    asmList.push_back("POP; remove the result");
+    asmList.push_back("MOV A, C");
+    saveOp(atom.third);
+}
+
+void LL::MOV(const LL::atom &atom) {
+    asmList.push_back("\n\t; MOV block");
+    loadOp(atom.first);
+    saveOp(atom.third);
+
+}
+
+void LL::LBL(const LL::atom &atom) {
+    asmList.push_back("\n" + atom.third + ":");
+}
+
+void LL::JMP(const LL::atom &atom) {
+    asmList.push_back("JMP " + atom.third);
+}
+
+void LL::AND(const LL::atom &atom) {
+    asmList.push_back("\n\t; AND block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("ANA B");
+    saveOp(atom.third);
+}
+
+void LL::OR(const LL::atom &atom) {
+    asmList.push_back("\n\t; OR block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("ORA B");
+    saveOp(atom.third);
+}
+
+void LL::EQ(const LL::atom &atom) {
+    asmList.push_back("\n\t; EQ block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("CMP B");
+    asmList.push_back("JZ " + atom.third);
+}
+
+void LL::NE(const LL::atom &atom) {
+    asmList.push_back("\n\t; NE block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("CMP B");
+    asmList.push_back("JNZ " + atom.third);
+}
+
+void LL::LT(const LL::atom &atom) {
+    asmList.push_back("\n\t; LT block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("CMP B");
+    asmList.push_back("JM " + atom.third);
+}
+
+void LL::LE(const LL::atom &atom) {
+    asmList.push_back("\n\t; LE block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("CMP B");
+    asmList.push_back("JZ " + atom.third);
+    asmList.push_back("JM" + atom.third);
+}
+
+void LL::GT(const LL::atom &atom) {
+    asmList.push_back("\n\t; GT block");
+    loadOp(atom.second);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first);
+    asmList.push_back("CMP B");
+    asmList.push_back("JP " + atom.third);
+}
+
+void LL::NOT(const LL::atom &atom) {
+    asmList.push_back("\n\t; NOT block");
+    loadOp(atom.first);
+    asmList.push_back("CMA");
+    saveOp(atom.third);
+}
+
+void LL::IN(const LL::atom &atom) {
+    asmList.push_back("\n\t; IN block");
+    asmList.push_back("IN 0");
+    loadOp(atom.third);
+}
+
+void LL::OUT(const LL::atom &atom) {
+    asmList.push_back("\n\t; OUT block");
+    loadOp(atom.third);
+    asmList.push_back("OUT 1");
+}
+
+void LL::PARAM(const LL::atom &atom) {
+
+}
+
+void LL::CALL(const LL::atom &atom) {
+
+}
+
+void LL::RET(const LL::atom &atom) {
+    int m = stoi(table[stoi(atom.scope) - 1].offset) - stoi(table[stoi(atom.scope) - 1].len);
+    asmList.push_back("\n\t; RET block");
+    loadOp(atom.third);
+    asmList.push_back("LXI H, " + to_string(m*2));
+    asmList.push_back("DAD SP");
+    asmList.push_back("MOV M, A");
+    for (int i = 0; i < m; i++){
+        asmList.push_back("POP");
+    }
+    asmList.push_back("RET");
+}
 //
 
 void LL::setLexem() {
@@ -845,10 +1018,12 @@ bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
 //
 //offset block control
         int counter = 0;
+        int total_cnt = 0;
         for (int i = table.size() - 1; i > stoi(codeFunc) - 1 + stoi(result.second); i--){
             if (table[i].scope == codeFunc){
                 table[i].offset = to_string(counter);
                 counter += 2;
+                total_cnt++;
             }
         }
 
@@ -857,7 +1032,9 @@ bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
         for (int i = stoi(codeFunc) + stoi(result.second) - 1; i > stoi(codeFunc) - 1; i-- ){
             table[i].offset = to_string(counter);
             counter += 2;
+            total_cnt++;
         }
+        table[stoi(codeFunc) - 1].offset = to_string(total_cnt); // the number of vars in the function
 //
 
         addAtom({codeFunc, "RET", "", "", "0"});

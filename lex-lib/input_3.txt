@@ -1,16 +1,18 @@
-int f(int n){
-    if (n == 0 || n==5 && n < 100) return 1;
-
-    return n * f(n - 1);
-}
-
-int a = 132;
 int a;
 
-int main (){
-    int a = 5;
-    out f(a);
-    if (a > 0) if (a == 0) out 1;
-    else out 2;
-    out "aaa";
+int func(int x, int y){
+    int temp = 0;
+    temp = (x + y) * 2;
+    if (temp < y) temp = y;
+    return temp;
+}
+
+int main(){
+    int b;
+    in a;
+    in b;
+    int result;
+    result = func(a, b);
+    out result;
+    return 0;
 }
