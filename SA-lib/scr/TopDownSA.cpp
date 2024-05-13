@@ -11,7 +11,13 @@ LL::LL(Lexer &lexer, const std::string & outPathstr, ST outputAtoms, ST outputAs
     outPathAsm = outputAsm;
 }
 
+
+
 void LL::solve() {
+    outStr.open(outPath, std::ofstream::out | std::ofstream::trunc);
+    outAtoms.open(outPathAtom, std::ofstream::out | std::ofstream::trunc);
+    out.open(outPathAsm, std::ofstream::out | std::ofstream::trunc);
+
     setLexem();
     statesIt = states.begin();
     nextState(0);
@@ -23,16 +29,19 @@ void LL::solve() {
 
     if (!printTree(f)) {
         cout << "Result: fail" << endl;
-        return; }
+        }
 
     else if (!printAtoms()) {
         cout << "Result: fail" << endl;
-        return; }
+        }
 
     else if (!asmBlock()) {
         cout << "Result: fail" << endl;
-        return; }
-    cout << "Result: all blocks are completed successfully" << endl;
+        }
+    else cout << "Result: all blocks are completed successfully" << endl;
+    outStr.close();
+    outAtoms.close();
+    out.close();
     return;
 }
 //
@@ -40,8 +49,7 @@ void LL::solve() {
 //print SA-Tree
 bool LL::printTree(bool fl) {
     cout << "-Syntax block: ";
-    outStr.open(outPath);
-    outStr.clear();
+
     if (fl) {
         for (const auto &now: output) {
             outStr << now << endl;
@@ -53,18 +61,15 @@ bool LL::printTree(bool fl) {
     else {
         outStr << endl << "Result: Error" << endl;
         cout << "Syntax error" << endl;
-        outStr.close();
         return false;
     }
-    outStr.close();
     return true;
 }
 //
 // print Atoms and semantic verification
 bool LL::printAtoms() {
-    ofstream outAtoms;
+
     cout << "-Semantic block: ";
-    outAtoms.open(outPathAtom);
     for (auto  now : atomList){
         if (now.scope == "$Error" or now.operation == "$Error" or now.second == "$Error" or now.first == "$Error" or now.third == "$Error"){
             outAtoms.clear();
@@ -109,17 +114,9 @@ bool LL::asmBlock() {
             asmList.push_back(now.name + " DB " + now.value);
         }
     }
-    asmList.push_back("ORG 0\nLXI H,0\nSPHL");
+    asmList.push_back("ORG 0\nLXI H,0\nSPHL\nPUSH B");
 
-    for (auto now: table){
-        if (now.name == "main" and now.scope == "-1"){
-            for (int i = 0; i < stoi(table[stoi(now.code.substr(1, now.code.size()- 2))].offset); i++){
-                asmList.push_back("PUSH B");
-            }
 
-            break;
-        }
-    }
     asmList.push_back("CALL main\nEND\n@MUL\n@DIV\n@PRINT\n\n");
     //
     //main block
@@ -152,12 +149,9 @@ bool LL::asmBlock() {
 }
 
 void LL::printAsm() {
-    out.open(outPathAsm);
-    out.clear();
     for (auto now: asmList){
         out << now << endl;
     }
-    out.close();
     return;
 }
 
@@ -172,7 +166,7 @@ void LL::loadOp(ST operand, ST scope, int newOffset = -1) {
     }
     //cout << "loadOp: " << stoi(operand) << endl;
     object item = table[stoi(operand.substr(1, operand.size() - 2)) - 1];
-    if (scope == "-1"){
+    if (item.scope == "-1"){
         asmList.push_back("LDA " + item.name);
     }
     else{
@@ -244,7 +238,17 @@ void LL::MOV(const LL::atom &atom) {
 }
 
 void LL::LBL(const LL::atom &atom) {
-    asmList.push_back("\n" + atom.third + ":");
+    asmList.push_back(atom.third + ":");
+    if (atom.third[0] != '$'){
+        for (auto now: table){
+            if (now.name == atom.third){
+                for (int i = 0; i < stoi(now.offset) - stoi(now.len); i++){
+                    asmList.push_back("PUSH B");
+                }
+                break;
+            }
+        }
+    }
 }
 
 void LL::JMP(const LL::atom &atom) {
@@ -352,7 +356,7 @@ void LL::CALL(const LL::atom &atom) {
     }
     for (int i = n - 1; i >= 0; i--){
         string item = programStack.top();
-        cout << atom.scope << endl;
+        //cout << atom.scope << endl;
         programStack.pop();
         int newOffset = stoi(table[stoi(funcCode) + i].offset) - (i + 1 != n ? stoi(table[stoi(funcCode) + i + 1].offset): 0);
         loadOp(item, atom.scope, newOffset);
@@ -373,10 +377,10 @@ void LL::CALL(const LL::atom &atom) {
 }
 
 void LL::RET(const LL::atom &atom) {
-    int m = stoi(table[stoi(atom.scope) - 1].offset) - stoi(table[stoi(atom.scope) - 1].len);
+    int m = stoi(table[stoi(atom.scope) - 1].offset);
     asmList.push_back("\n\t; RET block");
     loadOp(atom.third, atom.scope);
-    asmList.push_back("LXI H, " + to_string(m*2));
+    asmList.push_back("LXI H, " + to_string(m*2 + 2));
     asmList.push_back("DAD SP");
     asmList.push_back("MOV M, A");
     for (int i = 0; i < m; i++){
@@ -627,9 +631,9 @@ PBS LL::E5list(ST scope, ST p){
         auto l = newLabel();
         auto s = alloc(scope);
         addAtom({scope, "MOV", "1", "", s});
-        addAtom({scope, item, p, result.second, "L" + l});
+        addAtom({scope, item, p, result.second, "$L" + l});
         addAtom({scope, "MOV", "0", "", s});
-        addAtom({scope, "LBL", "", "", "L" + l});
+        addAtom({scope, "LBL", "", "", "$L" + l});
 
         backStateIt();
         return {true, s};
@@ -1266,11 +1270,13 @@ PBS LL::Arglist(ST scope) {
     nextState(0);
     addString("ArgList'");
 
+    addAtom({scope, "PARAM", "", "", result1.second});
+
     auto result = ArgListList(scope);
     if(!result.first) return {false, ""};
     backStateIt();
 
-    addAtom({scope, "PARAM", "", "", result1.second});
+
     return {true, to_string(stoi(result.second) + 1)};
 }
 
@@ -1369,7 +1375,7 @@ bool LL::WhileOp(ST scope) {
 
     auto label1 = newLabel();
     auto label2 = newLabel();
-    addAtom({scope, "LBL", "", "", "L" + label1});
+    addAtom({scope, "LBL", "", "", "$L" + label1});
 
     if (iter->first != "lpar") return false;
     setLexem();
@@ -1379,7 +1385,7 @@ bool LL::WhileOp(ST scope) {
     auto result = E(scope);
     if (!result.first) return false;
 
-    addAtom({scope, "EQ", result.second, "0", "L" + label2});
+    addAtom({scope, "EQ", result.second, "0", "$L" + label2});
 
     if (iter->first != "rpar") return false;
     setLexem();
@@ -1388,8 +1394,8 @@ bool LL::WhileOp(ST scope) {
     if (!Stmt(scope)) return false;
     backStateIt();
 
-    addAtom({scope, "JMP", "", "", "L" + label1});
-    addAtom({scope, "LBL", "", "", "L" + label2});
+    addAtom({scope, "JMP", "", "", "$L" + label1});
+    addAtom({scope, "LBL", "", "", "$L" + label2});
 
     return true;
 }
@@ -1414,28 +1420,28 @@ bool LL::ForOp(ST scope) {
     nextState(1);
     addString("semicolon ForExp");
 
-    addAtom({scope, "LBL", "", "", "L" + label1});
+    addAtom({scope, "LBL", "", "", "$L" + label1});
 
     auto result = ForExp(scope);
     if (!result.first) return false;
 
-    addAtom({scope, "EQ", result.second, "0", "L" + label4});
-    addAtom({scope, "JMP", "", "", "L" + label3});
-    addAtom({scope, "LBL", "", "", "L" + label2});
+    addAtom({scope, "EQ", result.second, "0", "$L" + label4});
+    addAtom({scope, "JMP", "", "", "$L" + label3});
+    addAtom({scope, "LBL", "", "", "$L" + label2});
 
     nextState(1);
     addString("semicolon ForLoop");
     if (!ForLoop(scope)) return false;
 
-    addAtom({scope, "JMP", "", "", "L" + label1});
-    addAtom({scope, "LBL", "", "", "L" + label3});
+    addAtom({scope, "JMP", "", "", "$L" + label1});
+    addAtom({scope, "LBL", "", "", "$L" + label3});
 
     nextState(0);
     addString("rpar Stmt");
     if (!Stmt(scope)) {return false; }
 
-    addAtom({scope, "JMP", "", "", "L" + label2});
-    addAtom({scope, "LBL", "", "", "L" + label4});
+    addAtom({scope, "JMP", "", "", "$L" + label2});
+    addAtom({scope, "LBL", "", "", "$L" + label4});
 
     backStateIt();
     return true;
@@ -1519,27 +1525,27 @@ bool LL::IfOp(ST scope) {
     setLexem();
 
     auto label1 = newLabel();
-    addAtom({scope, "EQ", result.second, "0", "L" + label1});
+    addAtom({scope, "EQ", result.second, "0", "$L" + label1});
 
     nextState(1);
     addString("rpar Stmt");
     if (!Stmt(scope)) return false;
 
     auto label2 = newLabel();
-    addAtom({scope, "JMP", "", "", "L" + label2});
-    addAtom({scope, "LBL", "", "", "L" + label1});
+    addAtom({scope, "JMP", "", "", "$L" + label2});
+    addAtom({scope, "LBL", "", "", "$L" + label1});
 
     nextState(0);
     addString("ElsePart");
     if (iter->first == "kwelse"){
         if (!ElsePart(scope)) return false;
 
-        addAtom({scope, "LBL", "", "", "L" + label2});
+        addAtom({scope, "LBL", "", "", "$L" + label2});
 
         backStateIt();
         return true;
     }
-    addAtom({scope, "LBL", "", "", "L" + label2});
+    addAtom({scope, "LBL", "", "", "$L" + label2});
 
     backStateIt();
     backStateIt();
@@ -1583,7 +1589,7 @@ bool LL::SwitchOp(ST scope) {
     backStateIt();
     backStateIt();
 
-    addAtom({scope, "LBL", "", "", "L" + end});
+    addAtom({scope, "LBL", "", "", "$L" + end});
     return true;
 }
 
@@ -1606,6 +1612,8 @@ bool LL::CasesList(ST scope, ST p, ST end, ST def) {
         nextState(1);
         addString("Acase");
 
+
+
         auto result = ACase(scope, p, end);
         if (!result.first) return false;
 
@@ -1622,7 +1630,7 @@ bool LL::CasesList(ST scope, ST p, ST end, ST def) {
     }
     cout << def << " " << end << endl;
     string q = stoi(def) >= 0 ? def: end;
-    addAtom({scope, "JMP", "", "", "L" + q});
+    addAtom({scope, "JMP", "", "", "$L" + q});
 
     backStateIt();
     return true;
@@ -1636,7 +1644,7 @@ PBS LL::ACase(ST scope, ST p, ST end) {
         setLexem();
 
         string next = newLabel();
-        addAtom({scope, "NE", p, item, "L" + next});
+        addAtom({scope, "NE", p, item, "$L" + next});
 
         if (iter->first != "colon") return {false, ""};
         nextState(0);
@@ -1644,8 +1652,8 @@ PBS LL::ACase(ST scope, ST p, ST end) {
         setLexem();
         if (!StmtList(scope)) return {false, ""};
 
-        addAtom({scope, "JMP", "", "", "L" + end});
-        addAtom({scope, "LBL", "", "", "L" + next});
+        addAtom({scope, "JMP", "", "", "$L" + end});
+        addAtom({scope, "LBL", "", "", "$L" + next});
 
         backStateIt();
         return {true, "-1"};
@@ -1662,14 +1670,14 @@ PBS LL::ACase(ST scope, ST p, ST end) {
         string next = newLabel();
         string def = newLabel();
 
-        addAtom({scope, "JMP", "", "", "L" + next});
-        addAtom({scope, "LBL", "", "", "L" + def});
+        addAtom({scope, "JMP", "", "", "$L" + next});
+        addAtom({scope, "LBL", "", "", "$L" + def});
 
         if (!StmtList(scope)) return {false, ""};
         backStateIt();
 
-        addAtom({scope, "JMP", "", "", "L" + end});
-        addAtom({scope, "LBL", "", "", "L" + next});
+        addAtom({scope, "JMP", "", "", "$L" + end});
+        addAtom({scope, "LBL", "", "", "$L" + next});
 
         return {true, def};
     }

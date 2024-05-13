@@ -1,11 +1,7 @@
 ORG 8000H
-a DB 0
 ORG 0
 LXI H,0
 SPHL
-PUSH B
-PUSH B
-PUSH B
 PUSH B
 CALL main
 END
@@ -14,32 +10,93 @@ END
 @PRINT
 
 
-
 func:
+PUSH B
+PUSH B
+PUSH B
+PUSH B
+
+	; MOV block
+MVI A, 1
+LXI H, 6
+DAD SP
+MOV M, A
+
+	; LE block
+MVI A, 1
+MOV B, A
+LXI H, 10
+DAD SP
+MOV A, M
+CMP B
+JZ $L0
+JM$L0
 
 	; MOV block
 MVI A, 0
 LXI H, 6
 DAD SP
 MOV M, A
+$L0:
 
-	; ADD block
+	; EQ block
+MVI A, 0
+MOV B, A
+LXI H, 6
+DAD SP
+MOV A, M
+CMP B
+JZ $L1
+
+	; RET block
+MVI A, 1
+LXI H, 12
+DAD SP
+MOV M, A
+POP
+POP
+POP
+POP
+POP
+RET
+JMP $L2
+$L1:
+$L2:
+
+	; SUB block
+MVI A, 1
+MOV B, A
 LXI H, 10
 DAD SP
 MOV A, M
-MOV B, A
-LXI H, 12
-DAD SP
-MOV A, M
-ADD B
+SUB B
 LXI H, 4
 DAD SP
 MOV M, A
 
+	; CALL block
+PUSH B
+PUSH B
+LXI H, 10
+DAD SP
+MOV A, M
+LXI H, 0
+DAD SP
+MOV M, A
+CALL func
+POP B
+POP B
+MOV A, C
+LXI H, 2
+DAD SP
+MOV M, A
+
 	; MUL block
-MVI A, 2
+LXI H, 2
+DAD SP
+MOV A, M
 MOV D, A
-LXI H, 4
+LXI H, 10
 DAD SP
 MOV A, M
 MOV C, A
@@ -50,72 +107,18 @@ CALL @MULT
 ; POP B; n times (delete local vars)
 POP B; remove the result
 MOV A, C
-LXI H, 2
-DAD SP
-MOV M, A
-
-	; MOV block
-LXI H, 2
-DAD SP
-MOV A, M
-LXI H, 6
-DAD SP
-MOV M, A
-
-	; MOV block
-MVI A, 1
 LXI H, 0
 DAD SP
 MOV M, A
-
-	; LT block
-LXI H, 10
-DAD SP
-MOV A, M
-MOV B, A
-LXI H, 6
-DAD SP
-MOV A, M
-CMP B
-JM L0
-
-	; MOV block
-MVI A, 0
-LXI H, 0
-DAD SP
-MOV M, A
-
-L0:
-
-	; EQ block
-MVI A, 0
-MOV B, A
-LXI H, 0
-DAD SP
-MOV A, M
-CMP B
-JZ L1
-
-	; MOV block
-LXI H, 10
-DAD SP
-MOV A, M
-LXI H, 6
-DAD SP
-MOV M, A
-JMP L2
-
-L1:
-
-L2:
 
 	; RET block
-LXI H, 6
+LXI H, 0
 DAD SP
 MOV A, M
-LXI H, 8
+LXI H, 12
 DAD SP
 MOV M, A
+POP
 POP
 POP
 POP
@@ -124,45 +127,28 @@ RET
 
 	; RET block
 MVI A, 0
-LXI H, 8
+LXI H, 12
 DAD SP
 MOV M, A
 POP
 POP
 POP
 POP
+POP
 RET
-
 main:
-
-	; IN block
-IN 0
-STA a
-
-	; IN block
-IN 0
-LXI H, 4
-DAD SP
-MOV M, A
+PUSH B
+PUSH B
+PUSH B
 
 	; CALL block
 PUSH B
 PUSH B
-PUSH B
-LXI H, 10
-DAD SP
-MOV A, M
+MVI A, 7
 LXI H, 0
 DAD SP
 MOV M, A
-LXI H, 2
-DAD SP
-MOV A, M
-LXI H, 2
-DAD SP
-MOV M, A
 CALL func
-POP B
 POP B
 POP B
 MOV A, C
@@ -174,19 +160,13 @@ MOV M, A
 LXI H, 0
 DAD SP
 MOV A, M
-LXI H, 2
+LXI H, 4
 DAD SP
 MOV M, A
 
-	; OUT block
-LXI H, 2
-DAD SP
-MOV A, M
-OUT 1
-
 	; RET block
 MVI A, 0
-LXI H, 6
+LXI H, 8
 DAD SP
 MOV M, A
 POP
@@ -196,15 +176,7 @@ RET
 
 	; RET block
 MVI A, 0
-LXI H, 6
-DAD SP
-MOV M, A
-POP
-POP
-POP
-RET
-I A, 0
-LXI H, 6
+LXI H, 8
 DAD SP
 MOV M, A
 POP

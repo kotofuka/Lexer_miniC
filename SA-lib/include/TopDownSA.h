@@ -228,6 +228,7 @@ private:
     //
 
     fstream out;
+    ofstream outAtoms;
 
 public:
     void solve ();
