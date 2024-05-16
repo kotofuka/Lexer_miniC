@@ -100,13 +100,8 @@ LXI H, 10
 DAD SP
 MOV A, M
 MOV C, A
-	; call black box with op @MULT
-PUSH B ; the place for the return value
-; PUSH B ; n times (add local vars) and other actions before the call
 CALL @MULT
-; POP B; n times (delete local vars)
-POP B; remove the result
-MOV A, C
+MOV A, B
 LXI H, 0
 DAD SP
 MOV M, A

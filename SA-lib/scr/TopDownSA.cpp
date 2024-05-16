@@ -220,13 +220,10 @@ void LL::MUL(const LL::atom &atom) {
     asmList.push_back("MOV D, A");
     loadOp(atom.first, atom.scope);
     asmList.push_back("MOV C, A");
-    asmList.push_back("\t; call black box with op @MULT");
-    asmList.push_back("PUSH B ; the place for the return value");
-    asmList.push_back("; PUSH B ; n times (add local vars) and other actions before the call");
+
     asmList.push_back("CALL @MULT");
-    asmList.push_back("; POP B; n times (delete local vars)");
-    asmList.push_back("POP B; remove the result");
-    asmList.push_back("MOV A, C");
+
+    asmList.push_back("MOV A, B");
     saveOp(atom.third);
 }
 
