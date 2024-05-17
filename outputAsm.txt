@@ -25,7 +25,7 @@ MOV M, A
 	; LE block
 MVI A, 1
 MOV B, A
-LXI H, 10
+LXI H, 12
 DAD SP
 MOV A, M
 CMP B
@@ -50,10 +50,9 @@ JZ $L1
 
 	; RET block
 MVI A, 1
-LXI H, 12
+LXI H, 10
 DAD SP
 MOV M, A
-POP
 POP
 POP
 POP
@@ -66,7 +65,7 @@ $L2:
 	; SUB block
 MVI A, 1
 MOV B, A
-LXI H, 10
+LXI H, 12
 DAD SP
 MOV A, M
 SUB B
@@ -77,13 +76,19 @@ MOV M, A
 	; CALL block
 PUSH B
 PUSH B
-LXI H, 10
-DAD SP
-MOV A, M
+PUSH B
+MVI A, 0
 LXI H, 0
 DAD SP
 MOV M, A
+LXI H, 2
+DAD SP
+MOV A, M
+LXI H, 2
+DAD SP
+MOV M, A
 CALL func
+POP B
 POP B
 POP B
 MOV A, C
@@ -96,7 +101,7 @@ LXI H, 2
 DAD SP
 MOV A, M
 MOV D, A
-LXI H, 10
+LXI H, 12
 DAD SP
 MOV A, M
 MOV C, A
@@ -110,10 +115,9 @@ MOV M, A
 LXI H, 0
 DAD SP
 MOV A, M
-LXI H, 12
+LXI H, 10
 DAD SP
 MOV M, A
-POP
 POP
 POP
 POP
@@ -122,10 +126,9 @@ RET
 
 	; RET block
 MVI A, 0
-LXI H, 12
+LXI H, 10
 DAD SP
 MOV M, A
-POP
 POP
 POP
 POP
@@ -135,15 +138,75 @@ main:
 PUSH B
 PUSH B
 PUSH B
+PUSH B
+
+	; MOV block
+MVI A, 0
+LXI H, 6
+DAD SP
+MOV M, A
+$L3:
+
+	; MOV block
+MVI A, 1
+LXI H, 2
+DAD SP
+MOV M, A
+
+	; GT block
+MVI A, 10
+MOV B, A
+LXI H, 6
+DAD SP
+MOV A, M
+CMP B
+JP $L7
+
+	; MOV block
+MVI A, 0
+LXI H, 2
+DAD SP
+MOV M, A
+$L7:
+
+	; EQ block
+MVI A, 0
+MOV B, A
+LXI H, 2
+DAD SP
+MOV A, M
+CMP B
+JZ $L6
+JMP $L5
+$L4:
+
+	; ADD block
+MVI A, 1
+MOV B, A
+LXI H, 6
+DAD SP
+MOV A, M
+ADD B
+LXI H, 6
+DAD SP
+MOV M, A
+JMP $L3
+$L5:
 
 	; CALL block
 PUSH B
 PUSH B
-MVI A, 7
+PUSH B
+MVI A, 8
 LXI H, 0
 DAD SP
 MOV M, A
+MVI A, 4
+LXI H, 2
+DAD SP
+MOV M, A
 CALL func
+POP B
 POP B
 POP B
 MOV A, C
@@ -158,12 +221,15 @@ MOV A, M
 LXI H, 4
 DAD SP
 MOV M, A
+JMP $L4
+$L6:
 
 	; RET block
 MVI A, 0
-LXI H, 8
+LXI H, 10
 DAD SP
 MOV M, A
+POP
 POP
 POP
 POP
@@ -171,9 +237,10 @@ RET
 
 	; RET block
 MVI A, 0
-LXI H, 8
+LXI H, 10
 DAD SP
 MOV M, A
+POP
 POP
 POP
 POP

@@ -1,10 +1,12 @@
-int func(int n){
+int func(int n, int m){
     if (n <= 1) return 1;
-    return n * func(n - 1);
+    return n * func(n - 1, 0);
 }
 
 int main(){
     int n, b;
-    n = func(7);
+    for (n = 0; n > 10 ; ++n) {
+        b = func(4, 8);
+    }
     return 0;
 }

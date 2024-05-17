@@ -374,7 +374,7 @@ void LL::CALL(const LL::atom &atom) {
 }
 
 void LL::RET(const LL::atom &atom) {
-    int m = stoi(table[stoi(atom.scope) - 1].offset);
+    int m = stoi(table[stoi(atom.scope) - 1].offset) - stoi(table[stoi(atom.scope) - 1].len);
     asmList.push_back("\n\t; RET block");
     loadOp(atom.third, atom.scope);
     asmList.push_back("LXI H, " + to_string(m*2 + 2));
@@ -1412,6 +1412,7 @@ bool LL::ForOp(ST scope) {
     addString("lpar ForInit");
     if (!ForInit(scope)) return false;
     if (iter->first != "semicolon") return false;
+
     setLexem();
     backStateIt();
     nextState(1);
@@ -1445,7 +1446,7 @@ bool LL::ForOp(ST scope) {
 }
 
 bool LL::ForInit(ST scope) {
-    if (iter->second == "id"){
+    if (iter->first == "id"){
         nextState(0);
         addString("AssignOrCall");
         if (!AssignOrCall(scope)) return false;
