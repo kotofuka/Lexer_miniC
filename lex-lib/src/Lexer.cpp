@@ -24,7 +24,8 @@ unordered_set <string> keywords = {
         "in",
         "switch",
         "case",
-        "return"
+        "return",
+        "default"
 };
 
 Lexer::Lexer(std::istream &stream): stream{stream} {

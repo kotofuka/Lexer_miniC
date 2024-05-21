@@ -1,12 +1,20 @@
-int func(int n, int m){
-    if (n <= 1) return 1;
-    return n * func(n - 1, 0);
+int func(int n){
+    if (n == 1 || n == 0) return 1;
+    return func(n - 1) + func(n - 2);
 }
 
 int main(){
-    int n, b;
-    for (n = 0; n > 10 ; ++n) {
-        b = func(4, 8);
+    int a;
+    in a;
+
+    out func(a);
+
+    switch(a){
+        case 0: a = 0;
+        case 1: a = 1;
+        default: a = -1;
+        case 3: a = 10;
     }
+
     return 0;
 }

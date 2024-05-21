@@ -359,7 +359,7 @@ void LL::CALL(const LL::atom &atom) {
         loadOp(item, atom.scope, newOffset);
 
 
-        asmList.push_back("LXI H, " + to_string((n - i - 1) * 2));
+        asmList.push_back("LXI H, " + to_string((n - 1) * 2));
         asmList.push_back("DAD SP");
         asmList.push_back("MOV M, A");
     }
@@ -377,7 +377,7 @@ void LL::RET(const LL::atom &atom) {
     int m = stoi(table[stoi(atom.scope) - 1].offset) - stoi(table[stoi(atom.scope) - 1].len);
     asmList.push_back("\n\t; RET block");
     loadOp(atom.third, atom.scope);
-    asmList.push_back("LXI H, " + to_string(m*2 + 2));
+    asmList.push_back("LXI H, " + to_string(m*2));
     asmList.push_back("DAD SP");
     asmList.push_back("MOV M, A");
     for (int i = 0; i < m; i++){
@@ -619,6 +619,7 @@ PBS LL::E5list(ST scope, ST p){
         auto item = iter->first.substr(2, iter->first.size());
         transform(item.begin(), item.end(), item.begin(), ::toupper);
         nextState(0);
+        //cout << item <<endl;
         addString(iter->first + " E4");
         setLexem();
 
@@ -777,7 +778,7 @@ PBS LL::E1(ST scope){
         backStateIt();
         backStateIt();
 
-        return {true, item};
+        return {true, item };
     }
     else if (iter->first == "lpar"){
         setLexem();
@@ -803,6 +804,8 @@ PBS LL::E1(ST scope){
         setLexem();
 
         auto result = E1List(scope, name);
+       // cout << name <<" qq: " << result.second << endl;
+
         if (!result.first) {return {false, ""}; }
         backStateIt();
         return {true, result.second};
@@ -851,6 +854,7 @@ PBS LL::E1List(ST scope, ST p) {
     }
     backStateIt();
     auto q = checkVar(scope, p);
+    //cout << "qq: " << q << endl;
     return {true, q};
 }
 
@@ -1568,6 +1572,7 @@ bool LL::SwitchOp(ST scope) {
     addString("lpar E");
 
     auto result = E(scope);
+    //cout << "qq: " << result.second << endl;
     if (!result.first) return false;
     if (iter->first != "rpar") return false;
     setLexem();
@@ -1611,7 +1616,6 @@ bool LL::CasesList(ST scope, ST p, ST end, ST def) {
         addString("Acase");
 
 
-
         auto result = ACase(scope, p, end);
         if (!result.first) return false;
 
@@ -1639,6 +1643,7 @@ PBS LL::ACase(ST scope, ST p, ST end) {
         setLexem();
         if (iter->first != "num" and iter->first != "char")return {false, ""};
         auto item = iter->second;
+        //cout << p  << "qq"<< endl;
         setLexem();
 
         string next = newLabel();
@@ -1659,6 +1664,7 @@ PBS LL::ACase(ST scope, ST p, ST end) {
     }
     else if (iter->first == "kwdefault"){
         setLexem();
+        //cout << "qq" << endl;
 
         if (iter->first != "colon") return {false, ""};
         setLexem();
