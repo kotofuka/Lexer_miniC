@@ -374,10 +374,10 @@ void LL::CALL(const LL::atom &atom) {
 }
 
 void LL::RET(const LL::atom &atom) {
-    int m = stoi(table[stoi(atom.scope) - 1].offset) - stoi(table[stoi(atom.scope) - 1].len);
+    int m = stoi(table[stoi(atom.scope) - 1].offset);
     asmList.push_back("\n\t; RET block");
     loadOp(atom.third, atom.scope);
-    asmList.push_back("LXI H, " + to_string(m*2));
+    asmList.push_back("LXI H, " + to_string(m*2 + 2));
     asmList.push_back("DAD SP");
     asmList.push_back("MOV M, A");
     for (int i = 0; i < m; i++){

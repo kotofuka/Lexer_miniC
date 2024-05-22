@@ -1,18 +1,19 @@
-int A;
-
-
-int func(int x, int y) {
-  int tmp = 0;
-  tmp = (x + y) * 2;
-  if (tmp < y) tmp = y;
-  return tmp;
+int fiba(int n) {
+  if (n == 0 || n == 1) return 1;
+  return fiba(n - 1) + fiba(n - 2);
 }
 
 int main() {
-  int b;
-  in A; in b;
-  int result;
-  result = func(A, b);
-  out result;
-  return 0;
+  int inp, res;
+  in inp;
+
+  int i = 13;
+  for (i = 0; i < inp; ++i) {
+    int j = 0;
+    res = fiba(i);
+    out res;
+
+  }
+
+  out res;
 }
