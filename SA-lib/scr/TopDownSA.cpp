@@ -111,7 +111,7 @@ bool LL::asmBlock() {
     asmList.push_back("ORG 8000H");
     for (auto now: table){
         if (now.scope == "-1" and now.kind == "var"){
-            asmList.push_back(now.name + " DB " + now.value);
+            asmList.push_back(now.name + ": DB " + now.value);
         }
     }
     asmList.push_back("ORG 0\nLXI H,0\nSPHL\nPUSH B");
@@ -359,7 +359,7 @@ void LL::CALL(const LL::atom &atom) {
         loadOp(item, atom.scope, newOffset);
 
 
-        asmList.push_back("LXI H, " + to_string((n - 1) * 2));
+        asmList.push_back("LXI H, " + to_string((i + 1 ) * 2));
         asmList.push_back("DAD SP");
         asmList.push_back("MOV M, A");
     }
