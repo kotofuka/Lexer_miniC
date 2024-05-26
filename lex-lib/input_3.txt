@@ -1,19 +1,7 @@
-int fiba(int n) {
-  if (n == 0 || n == 1) return 1;
-  return fiba(n - 1) + fiba(n - 2);
-}
+
 
 int main() {
   int inp, res;
   in inp;
 
-  int i = 13;
-  for (i = 0; i < inp; ++i) {
-    int j = 0;
-    res = fiba(i);
-    out res;
-
-  }
-
-  out res;
 }

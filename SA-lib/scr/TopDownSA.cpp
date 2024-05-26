@@ -23,6 +23,7 @@ void LL::solve() {
     nextState(0);
     addString("StmtList");
 
+
     bool f = StmtList("-1") and *iter == LEX_EOF;
 
     cout << "Execution results:" << endl;
@@ -408,14 +409,13 @@ void LL::nextState(const int &state) {
 }
 
 void LL::backStateIt() {
-    states.pop_back();
     if (statesIt > states.begin()) statesIt--;
     else statesIt = states.begin();
+    states.pop_back();
 }
 
 void LL::addString(const std::string &str) {
     string outputString;
-    treeHeight++;
     for (auto i = states.begin(); i != states.end(); i++){
         if (i == states.end() - 1){
             if (*i == 1) outputString += "├";
@@ -425,8 +425,8 @@ void LL::addString(const std::string &str) {
         if (*i == 1) outputString += "│ ";
         else outputString += "  ";
     }
+    treeHeight++;
     output.push_back(outputString + str);
-    //cout << outputString + str << endl;
 }
 //semantic func
 string LL::newLabel() {
@@ -866,10 +866,9 @@ bool LL::StmtList(ST scope) {
     addString("Stmt");
     auto listIt = iter;
     if (!Stmt(scope)){
-        iter = listIt;
-        backStateIt();
-        backStateIt();
         output.pop_back();
+        backStateIt();
+        backStateIt();
         return true;
     }
     nextState(0);
@@ -966,7 +965,6 @@ bool LL::Stmt(ST scope) {
         nextState(1);
         addString("lbrace StmtList");
         if (!StmtList(scope)) {return false; }
-//        cout << "LL" << iter->second << endl;
         if (iter->first != "rbrace") {return false; }
         setLexem();
         nextState(0);
@@ -1017,8 +1015,6 @@ PBS LL::Type(ST scope) {
 }
 
 bool LL::DeclareStmt(ST scope) {
-    if (*iter == LEX_EOF) return false;
-
     nextState(1);
     addString("Type");
 
@@ -1138,7 +1134,7 @@ bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
     }
     else {
         string var = addVar(q, scope, p);
-        if (var == "$Error")
+        if (var == "$Error") return false;
 
         nextState(1);
         addString("DeclareVarList");
@@ -1155,7 +1151,6 @@ bool LL::DeclareStmtList(ST scope, ST p, ST q) { // p = type, q = name
 
 bool LL::DeclareVarList(ST scope, ST p) {
     if (*iter == LEX_EOF) return false;
-    //cout << "!!" << endl;
 
     if (iter->first == "comma") {
         setLexem();
@@ -1499,7 +1494,7 @@ bool LL::ForLoop(ST scope) {
         return true;
     }
     if (iter->first == "id"){
-        nextState(1);
+        nextState(0);
         addString("AssignOrCall");
         if (!AssignOrCall(scope)) return false;
         if (iter->first != "rpar") return false;
@@ -1572,7 +1567,7 @@ bool LL::SwitchOp(ST scope) {
     addString("lpar E");
 
     auto result = E(scope);
-    //cout << "qq: " << result.second << endl;
+
     if (!result.first) return false;
     if (iter->first != "rpar") return false;
     setLexem();
@@ -1584,7 +1579,7 @@ bool LL::SwitchOp(ST scope) {
 
     auto end = newLabel();
     if (!Cases(scope, result.second, end)) return false;
-    //cout << 1 << endl;
+
     if (iter->first != "rbrace") return false;
     setLexem();
     nextState(0);
@@ -1602,7 +1597,7 @@ bool LL::Cases(ST scope, ST p, ST end) {
 
     auto result = ACase(scope, p, end);
     if (!result.first) return false;
-    //cout << 2 << endl;
+
     nextState(0);
     addString("CasesList");
     if (!CasesList(scope, p, end, result.second)) return false;
@@ -1628,6 +1623,8 @@ bool LL::CasesList(ST scope, ST p, ST end, ST def) {
         addString("CasesList");
 
         if (!CasesList(scope, p, end, def2)) return false;
+        backStateIt();
+        return true;
 
     }
     cout << def << " " << end << endl;
@@ -1643,7 +1640,7 @@ PBS LL::ACase(ST scope, ST p, ST end) {
         setLexem();
         if (iter->first != "num" and iter->first != "char")return {false, ""};
         auto item = iter->second;
-        //cout << p  << "qq"<< endl;
+
         setLexem();
 
         string next = newLabel();
@@ -1664,7 +1661,6 @@ PBS LL::ACase(ST scope, ST p, ST end) {
     }
     else if (iter->first == "kwdefault"){
         setLexem();
-        //cout << "qq" << endl;
 
         if (iter->first != "colon") return {false, ""};
         setLexem();
