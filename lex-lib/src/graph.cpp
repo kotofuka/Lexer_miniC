@@ -66,6 +66,7 @@ unordered_map<int, vector<E>> graph = {
 
         {2, {
                 {"=", 3, false, false, ""},
+                {"<", 24, false, false, ""},
                 {"", 0, false, true, "oplt"}
         }},
 
@@ -164,7 +165,11 @@ unordered_map<int, vector<E>> graph = {
         {23, {
                 {"digit", 23, true, true, ""},
                 {"", 0, false, false, "num"}
-        }}
+        }},
+
+        {24, {
+                {"", 0, false, true, "oplshift"}
+        }},
 };
 
 
