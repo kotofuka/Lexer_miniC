@@ -33,7 +33,11 @@ private:
     PBS E5(ST scope);
 
     PBS E5list(ST scope, ST p);
+// new block with binary left shift
+    PBS EShift(ST scope);
 
+    PBS EShiftlist(ST scope, ST p);
+//
     PBS E4(ST scope);
 
     PBS E4list(ST scope, ST p);
@@ -225,6 +229,9 @@ private:
     void CALL(const atom& atom);
 
     void RET(const atom& atom);
+    //
+    //new func for RAL
+    void RLC(const atom& atom);
     //
 
     fstream out;

@@ -13,18 +13,105 @@ END
 main:
 PUSH B
 PUSH B
+PUSH B
+PUSH B
 
 	; IN block
 IN 0
+LXI H, 6
+DAD SP
+MOV M, A
+
+	; RLC block
+LXI H, 6
+DAD SP
+MOV A, M
+MOV B, A
+LXI H, 4
+DAD SP
+MOV A, M
+$L3:
+RLC
+DCR B
+JMP $L3
 LXI H, 2
 DAD SP
 MOV M, A
 
 	; RET block
-MVI A, 0
-LXI H, 6
+LXI H, 2
+DAD SP
+MOV A, M
+LXI H, 10
 DAD SP
 MOV M, A
+POP
+POP
+POP
+POP
+RET
+
+	; MOV block
+MVI A, 1
+LXI H, 0
+DAD SP
+MOV M, A
+
+	; GT block
+MVI A, 2
+MOV B, A
+MVI A, 1
+CMP B
+JP $L0
+
+	; MOV block
+MVI A, 0
+LXI H, 0
+DAD SP
+MOV M, A
+$L0:
+
+	; EQ block
+MVI A, 0
+MOV B, A
+LXI H, 0
+DAD SP
+MOV A, M
+CMP B
+JZ $L1
+
+	; RET block
+MVI A, 0
+LXI H, 10
+DAD SP
+MOV M, A
+POP
+POP
+POP
+POP
+RET
+JMP $L2
+$L1:
+$L2:
+
+	; RET block
+MVI A, 1
+LXI H, 10
+DAD SP
+MOV M, A
+POP
+POP
+POP
+POP
+RET
+
+	; RET block
+MVI A, 0
+LXI H, 10
+DAD SP
+MOV M, A
+POP
+POP
 POP
 POP
 RET

@@ -141,6 +141,7 @@ bool LL::asmBlock() {
         else if (now.operation == "PARAM") PARAM(now);
         else if (now.operation == "CALL") CALL(now);
         else if (now.operation == "RET") RET(now); // done
+        else if (now.operation == "RLC") RLC(now); // done
     }
     //
     //printing assembly code
@@ -387,6 +388,20 @@ void LL::RET(const LL::atom &atom) {
     asmList.push_back("RET");
 }
 //
+// new func for RLC
+void LL::RLC(const LL::atom &atom) {
+    asmList.push_back("\n\t; RLC block");
+    loadOp(atom.second, atom.scope);
+    asmList.push_back("MOV B, A");
+    loadOp(atom.first, atom.scope);
+    ST label = newLabel();
+    asmList.push_back("$L" + label + ":");
+    asmList.push_back("RLC");
+    asmList.push_back("DCR B");
+    asmList.push_back("JMP $L" + label);
+    saveOp(atom.third);
+}
+//
 
 void LL::setLexem() {
     if (list.empty() or iter == list.end() - 1){
@@ -599,9 +614,9 @@ PBS LL::E6list(ST scope, ST p){
 PBS LL::E5(ST scope){
 
     nextState(1);
-    addString("E4");
+    addString("EShift");
 
-    auto result = E4(scope);
+    auto result = EShift(scope);
     if (!result.first) {return {false, ""}; }
 
     nextState(0);
@@ -620,10 +635,10 @@ PBS LL::E5list(ST scope, ST p){
         transform(item.begin(), item.end(), item.begin(), ::toupper);
         nextState(0);
         //cout << item <<endl;
-        addString(iter->first + " E4");
+        addString(iter->first + " EShift");
         setLexem();
 
-        auto result = E4(scope);
+        auto result = EShift(scope);
         if (!result.first) {return {false, ""}; }
 
         auto l = newLabel();
@@ -640,6 +655,44 @@ PBS LL::E5list(ST scope, ST p){
     return {true, p};
 }
 
+// new binary left shift
+PBS LL::EShift(ST scope) {
+    nextState(1);
+    addString("E4");
+
+    auto result = E4(scope);
+    if (!result.first) return {false, ""};
+
+    nextState(0);
+    addString("EShift'");
+
+    result = EShiftlist(scope, result.second);
+    if (!result.first) return {false, ""};
+
+    backStateIt();
+    return {true, result.second};
+}
+
+PBS LL::EShiftlist(ST scope, ST p) {
+    if (iter->first == "oplshift"){
+        setLexem();
+
+        nextState(0);
+        addString("oplshift E4");
+
+        auto result = E4(scope);
+        if (!result.first) return {false, ""};
+
+        auto s = alloc(scope);
+        addAtom({scope, "RLC", p, result.second, s});
+
+        backStateIt();
+        return {true, s};
+    }
+    backStateIt();
+    return {true, p};
+}
+//
 PBS LL::E4(ST scope){
 
     nextState(1);
