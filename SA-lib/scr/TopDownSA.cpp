@@ -121,30 +121,31 @@ bool LL::asmBlock() {
     asmList.push_back("CALL main\nEND\n@MUL\n@DIV\n@PRINT\n\n");
     //
     //main block
-    for (auto now: atomList){
-        if (now.operation == "ADD") ADD(now); // done
-        else if (now.operation == "SUB") SUB(now); // done
-        else if (now.operation == "MUL") MUL(now); // done
-        else if (now.operation == "MOV") MOV(now); // done
-        else if (now.operation == "LBL") LBL(now); // done
-        else if (now.operation == "JMP") JMP(now); // done
-        else if (now.operation == "AND") AND(now); // done
-        else if (now.operation == "OR") OR(now); // done
-        else if (now.operation == "EQ") EQ(now); // done
-        else if (now.operation == "NE") NE(now); // done
-        else if (now.operation == "LT") LT(now); // done
-        else if (now.operation == "LE") LE(now); // done
-        else if (now.operation == "GT") GT(now); // done
-        else if (now.operation == "NOT") NOT(now); // done
-        else if (now.operation == "IN") IN(now); // done
-        else if (now.operation == "OUT") OUT(now); // done
-        else if (now.operation == "PARAM") PARAM(now);
-        else if (now.operation == "CALL") CALL(now);
-        else if (now.operation == "RET") RET(now); // done
-        else if (now.operation == "RLC") RLC(now); // done
+    for (auto now: atomList){ // в цикле переводи атомы в веб-ассемблер
+        if (now.operation == "ADD") ADD(now); // вызов функции по трансляции атома "ADD" на веб-ассемблер
+        else if (now.operation == "SUB") SUB(now); // вызов функции по трансляции атома "SUB" на веб-ассемблер
+        else if (now.operation == "MUL") MUL(now); // вызов функции по трансляции атома "MUL" на веб-ассемблер
+        else if (now.operation == "MOV") MOV(now); // вызов функции по трансляции атома "MOV" на веб-ассемблер
+        else if (now.operation == "LBL") LBL(now); // вызов функции по трансляции атома "LBL" на веб-ассемблер
+        else if (now.operation == "JMP") JMP(now); // вызов функции по трансляции атома "JMP" на веб-ассемблер
+        else if (now.operation == "AND") AND(now); // вызов функции по трансляции атома "AND" на веб-ассемблер
+        else if (now.operation == "OR") OR(now); // вызов функции по трансляции атома "OR" на веб-ассемблер
+        else if (now.operation == "EQ") EQ(now); // вызов функции по трансляции атома "EQ" на веб-ассемблер
+        else if (now.operation == "NE") NE(now); // вызов функции по трансляции атома "NE" на веб-ассемблер
+        else if (now.operation == "LT") LT(now); // вызов функции по трансляции атома "LT" на веб-ассемблер
+        else if (now.operation == "LE") LE(now); // вызов функции по трансляции атома "LE" на веб-ассемблер
+        else if (now.operation == "GT") GT(now); // вызов функции по трансляции атома "GT" на веб-ассемблер
+        else if (now.operation == "NOT") NOT(now); // вызов функции по трансляции атома "NOT" на веб-ассемблер
+        else if (now.operation == "IN") IN(now); // вызов функции по трансляции атома "IN" на веб-ассемблер
+        else if (now.operation == "OUT") OUT(now); // вызов функции по трансляции атома "OUT" на веб-ассемблер
+        else if (now.operation == "PARAM") PARAM(now); // вызов функции по трансляции атома "PARAM" на веб-ассемблер
+        else if (now.operation == "CALL") CALL(now); // вызов функции по трансляции атома "CALL" на веб-ассемблер
+        else if (now.operation == "RET") RET(now); // вызов функции по трансляции атома "RET" на веб-ассемблер
+    // новая команда для побитового сдвига влево
+        else if (now.operation == "RLC") RLC(now); // вызов функции по трансляции атома "RLC" на веб-ассемблер
     }
     //
-    //printing assembly code
+    //printing assembly codes
     printAsm();
     cout << "Assembler code has been generated successfully" << endl;
     return true;
@@ -391,15 +392,15 @@ void LL::RET(const LL::atom &atom) {
 // new func for RLC
 void LL::RLC(const LL::atom &atom) {
     asmList.push_back("\n\t; RLC block");
-    loadOp(atom.second, atom.scope);
-    asmList.push_back("MOV B, A");
-    loadOp(atom.first, atom.scope);
-    ST label = newLabel();
-    asmList.push_back("$L" + label + ":");
-    asmList.push_back("RLC");
-    asmList.push_back("DCR B");
-    asmList.push_back("JMP $L" + label);
-    saveOp(atom.third);
+    loadOp(atom.second, atom.scope); // загружаем второе значение атома в аккумулятор
+    asmList.push_back("MOV B, A"); // перекладываем значение из аккумулятора в регистр "B"
+    loadOp(atom.first, atom.scope); // загружаем первое значение атома в аккумулятор
+    ST label = newLabel(); // генерирум номер метки
+    asmList.push_back("$L" + label + ":"); // создаем новую метку (в цикле будем сдвигать цифры в первом числе "B" раз)
+    asmList.push_back("RLC"); // сдвиг в первом числе всех цифр на один разряд влево
+    asmList.push_back("DCR B"); // вычитаем 1 из значения в регистре "B"
+    asmList.push_back("JMP $L" + label); // прыгаем к нашей сгенерированной метки
+    saveOp(atom.third); // выгружаем результат из аккумулятора
 }
 //
 
@@ -610,89 +611,89 @@ PBS LL::E6list(ST scope, ST p){
     backStateIt();
     return {true, p};
 }
+// основные изменения (расширили, добавив операцию "<<"
+PBS LL::E5(ST scope){ // scope - контекст
 
-PBS LL::E5(ST scope){
+    nextState(1); // добавляет текущий узел для дерева в вектор и говорит, что он не является правым
+    addString("EShift"); // дает название узлу, и рисует его на дереве, основываясь на векторе текущих узлов
 
-    nextState(1);
-    addString("EShift");
+    auto result = EShift(scope); // помещаем результат обхода дальше во временную переменную
+    if (!result.first) {return {false, ""}; } // проверка, что верны данные дальше
 
-    auto result = EShift(scope);
-    if (!result.first) {return {false, ""}; }
+    nextState(0); // добавляет текущий узел для дерева в вектор и говорит, что он является правым
+    addString("E5\'"); // дает название узлу, и рисует его на дереве, основываясь на векторе текущих узлов
 
-    nextState(0);
-    addString("E5\'");
-
-    result = E5list(scope, result.second);
-    if (!result.first) {return {false, ""}; }
-    backStateIt();
-    return {true, result.second};
+    result = E5list(scope, result.second); // помещаем результат обхода дальше во временную переменную
+    if (!result.first) {return {false, ""}; } // проверка, что верны данные дальше
+    backStateIt(); // удаляем уже обработанный узел из ветора текущих узлов
+    return {true, result.second}; // говорит, что обработка выражения прошла успешно и возвращает результат этой обработки
 }
 
 PBS LL::E5list(ST scope, ST p){
-    if (iter->first == "opeq" or iter->first == "opne" or iter->first == "oplt" or iter->first == "opgt" or
+    if (iter->first == "opeq" or iter->first == "opne" or iter->first == "oplt" or iter->first == "opgt" or // проверка, что сейчас лексему сравнения
             iter->first == "ople"){
-        auto item = iter->first.substr(2, iter->first.size());
-        transform(item.begin(), item.end(), item.begin(), ::toupper);
-        nextState(0);
-        //cout << item <<endl;
-        addString(iter->first + " EShift");
-        setLexem();
+        auto item = iter->first.substr(2, iter->first.size()); // запоминаем лексему сранения
+        transform(item.begin(), item.end(), item.begin(), ::toupper); // переводим все буквы в верхний регистр, чтобы использовать в атомах
 
-        auto result = EShift(scope);
-        if (!result.first) {return {false, ""}; }
+        nextState(0); // добавляет текущий узел для дерева в вектор и говорит, что он является правым
+        addString(iter->first + " EShift"); // дает название узлу, и рисует его на дереве, основываясь на векторе текущих узлов
+        setLexem(); // берем следующую лексему
 
-        auto l = newLabel();
-        auto s = alloc(scope);
-        addAtom({scope, "MOV", "1", "", s});
-        addAtom({scope, item, p, result.second, "$L" + l});
-        addAtom({scope, "MOV", "0", "", s});
-        addAtom({scope, "LBL", "", "", "$L" + l});
+        auto result = EShift(scope); // помещаем результат обхода дальше во временную переменную
+        if (!result.first) {return {false, ""}; } // проверка, что верны данные дальше
 
-        backStateIt();
-        return {true, s};
+        auto l = newLabel(); // генерируем номер новой метки
+        auto s = alloc(scope); // создаем новую временную переменную
+        addAtom({scope, "MOV", "1", "", s}); // создаем атом "MOV" с параметрами
+        addAtom({scope, item, p, result.second, "$L" + l}); // оздаем атом сранения item с параметрами
+        addAtom({scope, "MOV", "0", "", s}); // создаем атом "MOV" с параметрами
+        addAtom({scope, "LBL", "", "", "$L" + l}); // генерируем атом новой метки с номером "l"
+
+        backStateIt(); // удаляем уже обработанный узел из ветора текущих узлов
+        return {true, s}; // говорит, что обработка выражения прошла успешно и возвращает результат этой обработки
     }
-    backStateIt();
-    return {true, p};
+    backStateIt(); // удаляем уже обработанный узел из ветора текущих узлов
+    return {true, p}; // говорит, что обработка выражения прошла успешно и возвращает результат этой обработки
 }
 
-// new binary left shift
+// блок bitwise shift left
 PBS LL::EShift(ST scope) {
-    nextState(1);
-    addString("E4");
+    nextState(1); // добавляет текущий узел для дерева в вектор и говорит, что он не является правым
+    addString("E4"); // дает название узлу, и рисует его на дереве, основываясь на векторе текущих узлов
 
-    auto result = E4(scope);
-    if (!result.first) return {false, ""};
+    auto result = E4(scope); // помещаем результат обхода дальше во временную переменную
+    if (!result.first) return {false, ""}; // проверка, что верны данные дальше
 
-    nextState(0);
-    addString("EShift'");
+    nextState(0); // добавляет текущий узел для дерева в вектор и говорит, что он является правым
+    addString("EShift'"); // дает название узлу, и рисует его на дереве, основываясь на векторе текущих узлов
 
-    result = EShiftlist(scope, result.second);
-    if (!result.first) return {false, ""};
+    result = EShiftlist(scope, result.second); // помещаем результат обхода дальше во временную переменную
+    if (!result.first) return {false, ""}; // проверка, что верны данные дальше
 
-    backStateIt();
-    return {true, result.second};
+    backStateIt(); // удаляем уже обработанный узел из ветора текущих узлов
+    return {true, result.second}; // говорит, что обработка выражения прошла успешно и возвращает результат этой обработки
 }
 
 PBS LL::EShiftlist(ST scope, ST p) {
     if (iter->first == "oplshift"){
-        setLexem();
+        setLexem(); // берем следующую лексему
 
-        nextState(0);
-        addString("oplshift E4");
+        nextState(0); // добавляет текущий узел для дерева в вектор и говорит, что он является правым
+        addString("oplshift E4"); // дает название узлу, и рисует его на дереве, основываясь на векторе текущих узлов
 
-        auto result = E4(scope);
-        if (!result.first) return {false, ""};
+        auto result = E4(scope); // помещаем результат обхода дальше во временную переменную
+        if (!result.first) return {false, ""}; // проверка, что верны данные дальше
 
-        auto s = alloc(scope);
-        addAtom({scope, "RLC", p, result.second, s});
+        auto s = alloc(scope); // создаем новую временную переменную
+        addAtom({scope, "RLC", p, result.second, s}); // добавляем атом побитового сбдвига влево, результат в новой переменной "s"
 
-        backStateIt();
-        return {true, s};
+        backStateIt(); // удаляем уже обработанный узел из ветора текущих узлов
+        return {true, s}; // говорит, что обработка выражения прошла успешно и возвращает результат этой обработки
     }
-    backStateIt();
-    return {true, p};
+    backStateIt(); // удаляем уже обработанный узел из ветора текущих узлов
+    return {true, p}; // говорит, что обработка выражения прошла успешно и возвращает результат этой обработки
 }
-//
+// конец новых инструкций к РГР
 PBS LL::E4(ST scope){
 
     nextState(1);

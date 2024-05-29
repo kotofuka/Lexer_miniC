@@ -33,7 +33,7 @@ private:
     PBS E5(ST scope);
 
     PBS E5list(ST scope, ST p);
-// new block with binary left shift
+// new block with bitwise shift left
     PBS EShift(ST scope);
 
     PBS EShiftlist(ST scope, ST p);
@@ -230,7 +230,7 @@ private:
 
     void RET(const atom& atom);
     //
-    //new func for RAL
+    //new func for RLC
     void RLC(const atom& atom);
     //
 
